@@ -7,7 +7,6 @@ public class Drop_erea : MonoBehaviour
     {
         isInsideArea = true;
         Debug.Log("Player entered the area");
-       
     }
 
     void OnTriggerExit2D(Collider2D other)
