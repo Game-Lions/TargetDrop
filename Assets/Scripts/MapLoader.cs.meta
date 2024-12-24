@@ -1,0 +1,13 @@
+fileFormatVersion: 2
+guid: 215fc834c64e7824ba6ab9c71f5fa42d
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - myMaterial: {fileID: 2100000, guid: 4894541614b71bb4797864fef0f2175e, type: 2}
+  - myRawImage: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
