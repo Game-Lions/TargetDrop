@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.cesium.unity": "1.14.0",
     "com.unity.ai.navigation": "2.0.4",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.ide.rider": "3.0.31",
