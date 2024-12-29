@@ -10,6 +10,7 @@ public class MovePlayer : MonoBehaviour
     public float turnspeed = 0.5f;
     public bool ActiveControllers;
     private bool shiftHeld;
+    private bool sHeld;
 
 
     private void OnEnable()
@@ -33,10 +34,25 @@ public class MovePlayer : MonoBehaviour
             // Check if shift is held down
             shiftHeld = Keyboard.current.shiftKey.isPressed;
 
-            Vector2 movement = move.ReadValue<Vector2>();
-            rb.AddForce(transform.forward * speed);
+            // Check if S is held down
+            sHeld = Keyboard.current.sKey.isPressed;
 
+            Vector2 movement = move.ReadValue<Vector2>();
+            // Move player forward
+            if (sHeld)
+            {
+                
+                rb.AddForce(transform.forward * speed * 3);
+            }
+            else
+            {
+                rb.AddForce(transform.forward * speed);
+            }
+            
+
+            // Move player up
             rb.AddTorque(transform.right * turnspeed * movement.y);
+
             if (shiftHeld)
             {
                 rb.AddTorque(transform.forward * turnspeed * -movement.x);  // Spin the plane
@@ -46,5 +62,9 @@ public class MovePlayer : MonoBehaviour
                 rb.AddTorque(transform.up * turnspeed * movement.x);      // Turn the plane
             }
         }
+    }
+    public void setSpeed(float speed)
+    {
+        this.speed = speed;
     }
 }
