@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class HitTarget : MonoBehaviour
@@ -6,15 +7,22 @@ public class HitTarget : MonoBehaviour
     private GameObject target;
     private void OnCollisionEnter(Collision other)
     {
-        if (this.target == null)
+        if (other.gameObject.CompareTag("Spawner"))
         {
-            Debug.LogWarning("Target is null. Cannot calculate distance.");
-            return;
+            if (this.target == null)
+            {
+                Debug.LogWarning("Target is null. Cannot calculate distance.");
+                return;
+            }
+            float distanceFromTarget = Vector3.Distance(other.transform.position, target.transform.position);
+            Debug.Log("Distance from target: " + distanceFromTarget + " km");
+            GameManager.instance.TargetHit(distanceFromTarget);     // Send information to gameManager
+            Destroy(other.gameObject);
         }
-        float distanceFromTarget = Vector3.Distance(other.transform.position, target.transform.position);
-        Debug.Log("Distance from target: " + distanceFromTarget + " km");
-        GameManager.instance.TargetHit(distanceFromTarget);     // Send information to gameManager
-        Destroy(other.gameObject);
+        if (other.gameObject.CompareTag("Player"))
+        {
+            Debug.Log("Player crash!");
+        }
     }
     public void SetTarget(string targetName)
     {

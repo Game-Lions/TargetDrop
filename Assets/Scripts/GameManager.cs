@@ -6,27 +6,33 @@ using UnityEngine.InputSystem;
 
 public class GameManager : MonoBehaviour
 {
-    public GameState state;
-
     public static GameManager instance; // Singleton instance
-    //public GameObject map;
-    public GameObject terrain;
-    private HitTarget hitTarget;
-    public GameObject player;
+
+    // Game objects
+    [SerializeField] private GameObject map;
+    [SerializeField] private GameObject player;
+    [SerializeField] private GameObject telAvivArrow;
+
+    // Game scripts
+    [SerializeField] private HitTarget hitTargetScript; 
     [SerializeField] private MovePlayer movePlayerScript;
-    private MovePlayer movePlayer;
-    public GameObject arrow;
+    [SerializeField] private Spawner spawnerScript;
+
+    // Canvas game text
     public TextMeshProUGUI instructions;
     public TextMeshProUGUI next;
     public Image background;
 
-
-    public GameObject[] EasyLocations;
+    // Location objects
     public GameObject[] cities;
 
-    public bool isGamePaused = true; // Flag to control the pause state
+    // Manager Game state
+    private GameState state = GameState.Tutorial;
     private int TutorialStage = 0;
     private int MainGameStage = 0;
+    public bool isGamePaused = true;
+
+    // General
     private int Index_city = 0;
 
     private void Awake()
@@ -40,9 +46,9 @@ public class GameManager : MonoBehaviour
     private void InitializeGame()
     {
         //hitTarget = map.GetComponent<HitTarget>();
-        hitTarget = terrain.GetComponent<HitTarget>();
-        UpdateGameState(GameState.TutorialInstructions);
-
+        //hitTargetScript = map.GetComponent<HitTarget>();
+        //PauseGame(true);
+        UpdateGameState(GameState.Tutorial);
     }
     public void UpdateGameState(GameState newState)
     {
@@ -51,9 +57,7 @@ public class GameManager : MonoBehaviour
         {
             case GameState.Menu:
                 break;
-            case GameState.TutorialInstructions:
-                arrow.SetActive(true);
-                hitTarget.SetTarget("TelAviv");
+            case GameState.Tutorial:
                 break;
             case GameState.MainGame:
                 break;
@@ -65,11 +69,12 @@ public class GameManager : MonoBehaviour
     {
         isGamePaused = pause;
         movePlayerScript.ActiveControllers = !isGamePaused;
+        spawnerScript.enabled = !isGamePaused;
     }
 
     private void isEnterPressedYet()
     {
-        if (state == GameState.TutorialInstructions && Input.GetKeyDown(KeyCode.Return))
+        if (state == GameState.Tutorial && Input.GetKeyDown(KeyCode.Return))
         {
             TutorialStage++;
         }
@@ -83,15 +88,10 @@ public class GameManager : MonoBehaviour
     public void Update()
     {
         // Tutorial
-        if (state == GameState.TutorialInstructions)
+        if (state == GameState.Tutorial)
         {
             Tutorial();
-            isEnterPressedYet();
         }
-
-        //if (state == GameState.Tutorialplay)
-        //{
-        //}
 
         // Main game
         if (state == GameState.MainGame)
@@ -108,20 +108,23 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void Tutorial()
+    private void Tutorial()
     {
         switch (TutorialStage)
         {
             case 0:
                 PauseGame(true);
+                hitTargetScript.SetTarget("TelAviv");
                 instructions.fontSize = 70;
                 instructions.text = "Welcome to TargetDrop!";
+                isEnterPressedYet();
                 break;
             case 1:
 
                 instructions.fontSize = 40;
                 instructions.alignment = TextAlignmentOptions.Top;
                 instructions.text = "Lets start with the basics!\n\r\nHow to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\nRight arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package";
+                isEnterPressedYet();
                 break;
             case 2:
                 instructions.alignment = TextAlignmentOptions.Top;
@@ -130,23 +133,28 @@ public class GameManager : MonoBehaviour
                 instructions.fontSize = 60;
                 instructions.text = "Try dropping delivery on Tel Aviv in less then 5 km distance!";
                 PauseGame(false);
-                UpdateGameState(GameState.Tutorialplay);
+                TutorialStage++;
+                //UpdateGameState(GameState.Tutorialplay);
+                break;
+            case 3:
+                // Here i want the code to skip othor options and wait for target hit
+
                 break;
         }
     }
 
-    public void MainGame(int city)
+    private void MainGame(int city)
     {
         switch (MainGameStage)
         {
             case 0:
+                // Wait to start game
                 isEnterPressedYet();
                 break;
             case 1:
                 player.transform.position = new Vector3(-135, 9, -268);
                 instructions.text = "Hit " + cities[city].name;
-                hitTarget.SetTarget(cities[city].name);
-                //UpdateGameState(GameState.Tutorialplay);
+                hitTargetScript.SetTarget(cities[city].name);
                 MainGameStage++;
                 break;
             case 2:
@@ -157,17 +165,20 @@ public class GameManager : MonoBehaviour
 
     public void TargetHit(double distance)
     {
-        if (state == GameState.Tutorialplay)
+        if (state == GameState.Tutorial)
         {
             if (distance > 5)
             {
                 instructions.text = "You hit " + distance.ToString("F2") + " km from the target, try hitting closer!";
+                return;
             }
             else
             {
                 instructions.text = "Good job! You hit the target! \r\n Press enter to begin the game!";
+                telAvivArrow.SetActive(false);
                 PauseGame(true);
                 UpdateGameState(GameState.MainGame);
+                return;
             }
         }
 
@@ -175,25 +186,24 @@ public class GameManager : MonoBehaviour
         {
             if (distance > 5)
             {
-                instructions.text = "You hit " + distance.ToString("F2") + " km from the target, try hitting closer!";
+                instructions.text = "You missed by : " + distance.ToString("F2") + " km, try hitting closer!";
+                return;
             }
             else
             {
                 Index_city++;
-                hitTarget.SetTarget(cities[Index_city].name);
-                instructions.text = "Good job. next target: "+ cities[Index_city].name;
+                hitTargetScript.SetTarget(cities[Index_city].name);
+                instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
+                return;
             }
         }
-
-
     }
 }
 
 public enum GameState
 {
     Menu,
-    TutorialInstructions,
-    Tutorialplay,
+    Tutorial,
     MainGame,
     pause,
     none

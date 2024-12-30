@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -11,7 +12,6 @@ public class MovePlayer : MonoBehaviour
     public bool ActiveControllers;
     private bool shiftHeld;
     private bool sHeld;
-
 
     private void OnEnable()
     {
