@@ -41,14 +41,14 @@ public class MovePlayer : MonoBehaviour
             // Move player forward
             if (sHeld)
             {
-                
+
                 rb.AddForce(transform.forward * speed * 3);
             }
             else
             {
                 rb.AddForce(transform.forward * speed);
             }
-            
+
 
             // Move player up
             rb.AddTorque(transform.right * turnspeed * movement.y);

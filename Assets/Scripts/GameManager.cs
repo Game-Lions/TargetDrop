@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject telAvivArrow;
 
     // Game scripts
-    [SerializeField] private HitTarget hitTargetScript; 
+    [SerializeField] private HitTarget hitTargetScript;
     [SerializeField] private MovePlayer movePlayerScript;
     [SerializeField] private Spawner spawnerScript;
 
@@ -159,7 +159,7 @@ public class GameManager : MonoBehaviour
                 break;
             case 1:
                 player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
-                player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37,0);
+                player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
                 instructions.text = "Drop on : " + cities[city].name;
                 hitTargetScript.SetTarget(cities[city].name);
                 MainGameStage++;
