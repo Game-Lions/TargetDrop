@@ -67,9 +67,15 @@ public class GameManager : MonoBehaviour
     }
     private void PauseGame(bool pause)
     {
+
         isGamePaused = pause;
         movePlayerScript.ActiveControllers = !isGamePaused;
         spawnerScript.enabled = !isGamePaused;
+
+        // Stop all movement and rotation
+        Rigidbody rb = player.GetComponent<Rigidbody>();
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
     }
 
     private void isEnterPressedYet()
@@ -152,8 +158,9 @@ public class GameManager : MonoBehaviour
                 isEnterPressedYet();
                 break;
             case 1:
-                player.transform.position = new Vector3(-135, 9, -268);
-                instructions.text = "Hit " + cities[city].name;
+                player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
+                player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37,0);
+                instructions.text = "Drop on : " + cities[city].name;
                 hitTargetScript.SetTarget(cities[city].name);
                 MainGameStage++;
                 break;
@@ -174,7 +181,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                instructions.text = "Good job! You hit the target! \r\n Press enter to begin the game!";
+                instructions.text = "Good job! You Droped on the target! \r\n Press enter to begin the game!";
                 telAvivArrow.SetActive(false);
                 PauseGame(true);
                 UpdateGameState(GameState.MainGame);
