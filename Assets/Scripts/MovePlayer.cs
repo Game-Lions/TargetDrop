@@ -19,8 +19,6 @@ public class MovePlayer : MonoBehaviour
     [SerializeField]
     GameObject[] plane;
 
-    private bool hasReached = false;
-
     private void OnEnable()
     {
         move.Enable();
