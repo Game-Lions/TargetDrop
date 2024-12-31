@@ -76,6 +76,24 @@ public class GameManager : MonoBehaviour
         Rigidbody rb = player.GetComponent<Rigidbody>();
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+        //if(isGamePaused)
+        //{
+        //    // Print the rules
+        //    instructions.text = "How to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
+        //            "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
+        //            "S - boost speed \r\n P - pause game";
+        //}
+        //else
+        //{
+        //    if (state == GameState.Tutorial)
+        //    {
+        //        instructions.text = "Try dropping delivery on Tel Aviv in less then 5 km distance!";
+        //    }
+        //    else
+        //    {
+        //        instructions.text = "";
+        //    }
+        //}
     }
 
     private void isEnterPressedYet()
@@ -184,9 +202,9 @@ public class GameManager : MonoBehaviour
             else
             {
                 instructions.text = "Good job! You Droped on the target! \r\n Press enter to begin the game!";
-                telAvivArrow.SetActive(false);
-                PauseGame(true);
                 UpdateGameState(GameState.MainGame);
+                PauseGame(true);
+                telAvivArrow.SetActive(false);
                 return;
             }
         }

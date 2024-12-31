@@ -1,3 +1,5 @@
+using Mono.Cecil.Cil;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -12,6 +14,12 @@ public class MovePlayer : MonoBehaviour
     public bool ActiveControllers;
     private bool shiftHeld;
     private bool sHeld;
+    public float boost;
+    public float propellerSpeed;
+    [SerializeField]
+    GameObject[] plane;
+
+    private bool hasReached = false;
 
     private void OnEnable()
     {
@@ -29,6 +37,9 @@ public class MovePlayer : MonoBehaviour
 
     void FixedUpdate()
     {
+        // Spin propeller
+        plane[2].transform.Rotate(Vector3.left, propellerSpeed * Time.deltaTime);
+
         if (ActiveControllers)
         {
             // Check if shift is held down
@@ -38,28 +49,34 @@ public class MovePlayer : MonoBehaviour
             sHeld = Keyboard.current.sKey.isPressed;
 
             Vector2 movement = move.ReadValue<Vector2>();
+
             // Move player forward
             if (sHeld)
             {
-
-                rb.AddForce(transform.forward * speed * 3);
+                rb.AddForce(transform.forward * speed * boost);
             }
             else
             {
                 rb.AddForce(transform.forward * speed);
             }
 
-
-            // Move player up
-            rb.AddTorque(transform.right * turnspeed * movement.y);
-
-            if (shiftHeld)
+            // Move player up and down
+            if (movement.y != 0)
             {
-                rb.AddTorque(transform.forward * turnspeed * -movement.x);  // Spin the plane
+                rb.AddTorque(transform.right * turnspeed * movement.y);
             }
-            else
+
+            // Move player left and right
+            if (movement.x != 0)
             {
-                rb.AddTorque(transform.up * turnspeed * movement.x);      // Turn the plane
+                if (shiftHeld)
+                {
+                    rb.AddTorque(transform.forward * turnspeed * -movement.x);  // Spin the plane
+                }
+                else
+                {
+                    rb.AddTorque(transform.up * turnspeed * movement.x);      // Turn the plane
+                }
             }
         }
     }
