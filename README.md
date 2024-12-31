@@ -4,4 +4,5 @@ itch.io - https://michibinyamin.itch.io/target-drop
 
 שמות חברי הצוות: מיכאל בנימין ועדי יוחנן
 
-[לפירות רכיבים רשמיים וסקר שוק](formal-elements.md)
+[לפירות רכיבים רשמיים וסקר שוק](formal-elements.md)    
+[לתרשים UML](UML_game.pdf)
