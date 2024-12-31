@@ -162,9 +162,9 @@ public class GameManager : MonoBehaviour
             case 1:
                 player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
                 player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
-                    instructions.text = "Drop on : " + cities[Index_city].name;
-                    hitTargetScript.SetTarget(cities[Index_city].name);
-                    MainGameStage++;
+                instructions.text = "Drop on : " + cities[Index_city].name;
+                hitTargetScript.SetTarget(cities[Index_city].name);
+                MainGameStage++;
                 break;
             case 2:
 
@@ -201,7 +201,8 @@ public class GameManager : MonoBehaviour
             else
             {
                 Index_city++;
-                if (Index_city < cities.Length) { 
+                if (Index_city < cities.Length)
+                {
                     hitTargetScript.SetTarget(cities[Index_city].name);
                     instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
                 }
