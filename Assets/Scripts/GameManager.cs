@@ -129,7 +129,9 @@ public class GameManager : MonoBehaviour
 
                 instructions.fontSize = 40;
                 instructions.alignment = TextAlignmentOptions.Top;
-                instructions.text = "Lets start with the basics!\n\r\nHow to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\nRight arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package";
+                instructions.text = "Lets start with the basics!\n\r\nHow to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
+                    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
+                    "S - boost speed \r\n P - pause game";
                 isEnterPressedYet();
                 break;
             case 2:
@@ -149,7 +151,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void MainGame(int city)
+    private void MainGame(int Index_city)
     {
         switch (MainGameStage)
         {
@@ -160,9 +162,9 @@ public class GameManager : MonoBehaviour
             case 1:
                 player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
                 player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
-                instructions.text = "Drop on : " + cities[city].name;
-                hitTargetScript.SetTarget(cities[city].name);
-                MainGameStage++;
+                    instructions.text = "Drop on : " + cities[Index_city].name;
+                    hitTargetScript.SetTarget(cities[Index_city].name);
+                    MainGameStage++;
                 break;
             case 2:
 
@@ -199,8 +201,15 @@ public class GameManager : MonoBehaviour
             else
             {
                 Index_city++;
-                hitTargetScript.SetTarget(cities[Index_city].name);
-                instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
+                if (Index_city < cities.Length) { 
+                    hitTargetScript.SetTarget(cities[Index_city].name);
+                    instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
+                }
+                else
+                {
+                    instructions.text = "Good job! you passed the first level!";
+                    PauseGame(true);
+                }
                 return;
             }
         }
