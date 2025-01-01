@@ -20,7 +20,8 @@ public class Spawner : MonoBehaviour
 
     private void OnDrop(InputAction.CallbackContext context)
     {
+        GameObject parentObject = transform.parent.gameObject;
         GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
+        obj.transform.Rotate(new Vector3(-90, parentObject.transform.rotation.y, parentObject.transform.rotation.z), Space.Self);
     }
-
 }

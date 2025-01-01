@@ -139,15 +139,15 @@ public class GameManager : MonoBehaviour
             case 0:
                 PauseGame(true);
                 hitTargetScript.SetTarget("TelAviv");
-                instructions.fontSize = 70;
+                instructions.fontSize = 30;
                 instructions.text = "Welcome to TargetDrop!";
                 isEnterPressedYet();
                 break;
             case 1:
 
-                instructions.fontSize = 40;
+                instructions.fontSize = 19;
                 instructions.alignment = TextAlignmentOptions.Top;
-                instructions.text = "Lets start with the basics!\n\r\nHow to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
+                instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
                     "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
                     "S - boost speed \r\n P - pause game";
                 isEnterPressedYet();
@@ -156,8 +156,8 @@ public class GameManager : MonoBehaviour
                 instructions.alignment = TextAlignmentOptions.Top;
                 background.enabled = false;
                 next.enabled = false;
-                instructions.fontSize = 60;
-                instructions.text = "Try dropping delivery on Tel Aviv in less then 5 km distance!";
+                instructions.fontSize = 20;
+                instructions.text = "Try dropping delivery on Tel Aviv\r\nin less then 5 km distance!";
                 PauseGame(false);
                 TutorialStage++;
                 //UpdateGameState(GameState.Tutorialplay);
@@ -196,7 +196,7 @@ public class GameManager : MonoBehaviour
         {
             if (distance > 5)
             {
-                instructions.text = "You hit " + distance.ToString("F2") + " km from the target, try hitting closer!";
+                instructions.text = "You hit " + distance.ToString("F2") + " km from the target,\r\n try hitting closer!";
                 return;
             }
             else
@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
         {
             if (distance > 5)
             {
-                instructions.text = "You missed by : " + distance.ToString("F2") + " km, try hitting closer!";
+                instructions.text = "You missed by : " + distance.ToString("F2") + " km,\r\n try hitting closer!";
                 return;
             }
             else
