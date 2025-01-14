@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class Spawner : MonoBehaviour
 {
     public GameObject objectToSpawn;
     public InputAction dropAction;  // Input Action for dropping the gift
+    public float throwForce;
+    private bool canDrop = true;    // A flag to prevent multiple drops during the cooldown
 
     private void OnEnable()
     {
@@ -20,8 +23,29 @@ public class Spawner : MonoBehaviour
 
     private void OnDrop(InputAction.CallbackContext context)
     {
-        GameObject parentObject = transform.parent.gameObject;
-        GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
-        obj.transform.Rotate(new Vector3(-90, parentObject.transform.rotation.y, parentObject.transform.rotation.z), Space.Self);
+        if (canDrop)
+        {
+            canDrop = false;  // Prevent dropping during cooldown
+
+            GameObject parentObject = transform.parent.gameObject;
+            GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
+            // Apply a force or velocity to throw the object forward
+            Rigidbody rb = obj.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                Vector3 forwardDirection = transform.forward; // Forward direction of the parent object
+                Vector3 upwardDirection = transform.up;      // Upward direction
+                Vector3 combinedDirection = forwardDirection + upwardDirection;
+                rb.AddForce(combinedDirection.normalized * throwForce, ForceMode.VelocityChange);
+            }
+
+            StartCoroutine(StartCooldown());
+        }
+    }
+
+    private IEnumerator StartCooldown()
+    {
+        yield return new WaitForSeconds(5f);  // Wait for 5 seconds
+        canDrop = true;  // Allow dropping again
     }
 }

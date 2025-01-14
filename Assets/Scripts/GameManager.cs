@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
     // Canvas game text
     public TextMeshProUGUI instructions;
     public TextMeshProUGUI next;
+    public TextMeshProUGUI targetText;
     public Image background;
 
     // Location objects
@@ -182,6 +183,7 @@ public class GameManager : MonoBehaviour
                 player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
                 instructions.text = "Drop on : " + cities[Index_city].name;
                 hitTargetScript.SetTarget(cities[Index_city].name);
+                targetText.text = "Target: " + cities[Index_city].name;
                 MainGameStage++;
                 break;
             case 2:
@@ -223,10 +225,12 @@ public class GameManager : MonoBehaviour
                 {
                     hitTargetScript.SetTarget(cities[Index_city].name);
                     instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
+                    targetText.text = "Target: " + cities[Index_city].name;
                 }
                 else
                 {
                     instructions.text = "Good job! you passed the first level!";
+                    targetText.text = "";
                     PauseGame(true);
                 }
                 return;
