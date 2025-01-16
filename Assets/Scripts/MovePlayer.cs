@@ -37,7 +37,7 @@ public class MovePlayer : MonoBehaviour
     private float currentRotationRL = 0;
 
     public float graphicAcceleration;
-   public float graphicStartingSpeed;
+    public float graphicStartingSpeed;
 
     public float rotationSpeedSpin;
 
@@ -122,7 +122,7 @@ public class MovePlayer : MonoBehaviour
                 }
                 else
                 {
-                    
+
                     if (currentRotationUD > -maxRotationUD)
                     {
                         rotationSpeedUD2 += graphicAcceleration * Time.deltaTime;

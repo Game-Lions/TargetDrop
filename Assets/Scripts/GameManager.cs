@@ -106,7 +106,7 @@ public class GameManager : MonoBehaviour
                 targetText.enabled = true;
                 MissedOrHit.enabled = true;
             }
-            else if(state == GameState.Tutorial)
+            else if (state == GameState.Tutorial)
             {
                 instructions.enabled = true;
             }
@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
             //{
             ControllersMenu(false);
             //}
-                
+
         }
         //if(isGamePaused)
         //{
