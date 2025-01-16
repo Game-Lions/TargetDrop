@@ -8,6 +8,7 @@ public class Spawner : MonoBehaviour
     public InputAction dropAction;  // Input Action for dropping the gift
     public float throwForce;
     private bool canDrop = true;    // A flag to prevent multiple drops during the cooldown
+    public float timeBetweenEachDrop;
 
     private void OnEnable()
     {
@@ -33,10 +34,15 @@ public class Spawner : MonoBehaviour
             Rigidbody rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
             {
-                Vector3 forwardDirection = transform.forward; // Forward direction of the parent object
-                Vector3 upwardDirection = transform.up;      // Upward direction
-                Vector3 combinedDirection = forwardDirection + upwardDirection;
-                rb.AddForce(combinedDirection.normalized * throwForce, ForceMode.VelocityChange);
+                //Vector3 forwardDirection = transform.forward; // Forward direction of the parent object
+                //Vector3 upwardDirection = transform.up;      // Upward direction
+                //Vector3 combinedDirection = forwardDirection + upwardDirection;
+                //rb.AddForce(combinedDirection.normalized * throwForce, ForceMode.VelocityChange);
+
+                //Vector3 forwardDirection = transform.forward; // Forward direction of the parent object
+                //Vector3 upwardDirection = transform.up;      // Upward direction
+                //Vector3 combinedDirection = forwardDirection + upwardDirection;
+                //rb.AddForce(forwardDirection.normalized * throwForce, ForceMode.VelocityChange);
             }
 
             StartCoroutine(StartCooldown());
@@ -45,7 +51,7 @@ public class Spawner : MonoBehaviour
 
     private IEnumerator StartCooldown()
     {
-        yield return new WaitForSeconds(5f);  // Wait for 5 seconds
+        yield return new WaitForSeconds(timeBetweenEachDrop);  // Wait for 5 seconds
         canDrop = true;  // Allow dropping again
     }
 }

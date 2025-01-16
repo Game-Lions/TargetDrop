@@ -3,6 +3,9 @@ using TMPro;
 //using UnityEngine.UIElements;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
+using Mono.Cecil.Cil;
+using static System.Net.Mime.MediaTypeNames;
 
 public class GameManager : MonoBehaviour
 {
@@ -20,9 +23,14 @@ public class GameManager : MonoBehaviour
 
     // Canvas game text
     public TextMeshProUGUI instructions;
+    public TextMeshProUGUI controllers;
     public TextMeshProUGUI next;
+    public TextMeshProUGUI MissedOrHit;
     public TextMeshProUGUI targetText;
-    public Image background;
+    public RawImage targetLogo;
+    public RawImage gameLogo;
+    public RawImage background;
+    public RawImage InstructionsBackground;
 
     // Location objects
     public GameObject[] cities;
@@ -49,6 +57,12 @@ public class GameManager : MonoBehaviour
         //hitTarget = map.GetComponent<HitTarget>();
         //hitTargetScript = map.GetComponent<HitTarget>();
         //PauseGame(true);
+        targetText.enabled = false;
+        targetLogo.enabled = false;
+        MissedOrHit.enabled = false;
+        InstructionsBackground.enabled = false;
+        instructions.enabled = false;
+        controllers.enabled = false;
         UpdateGameState(GameState.Tutorial);
     }
     public void UpdateGameState(GameState newState)
@@ -66,10 +80,44 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    private void PauseGame(bool pause)
+    private void ControllersMenu(bool activate)
     {
-
-        isGamePaused = pause;
+        if (activate)
+        {
+            targetLogo.enabled = false;
+            targetText.enabled = false;
+            MissedOrHit.enabled = false;
+            instructions.enabled = false;
+            InstructionsBackground.enabled = true;
+            //instructions.enabled = true;
+            //instructions.fontSize = 19;
+            //instructions.alignment = TextAlignmentOptions.Top;
+            controllers.enabled = true;
+            //instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
+            //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
+            //    "S - boost speed \r\n P - pause game";
+            next.enabled = true;
+        }
+        else
+        {
+            if (state != GameState.Tutorial)
+            {
+                targetLogo.enabled = true;
+                targetText.enabled = true;
+                MissedOrHit.enabled = true;
+            }
+            else if(state == GameState.Tutorial)
+            {
+                instructions.enabled = true;
+            }
+            next.enabled = false;
+            InstructionsBackground.enabled = false;
+            controllers.enabled = false;
+        }
+    }
+    private void StopPlane(bool shouldStop)
+    {
+        isGamePaused = shouldStop;
         movePlayerScript.ActiveControllers = !isGamePaused;
         spawnerScript.enabled = !isGamePaused;
 
@@ -77,6 +125,25 @@ public class GameManager : MonoBehaviour
         Rigidbody rb = player.GetComponent<Rigidbody>();
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+    }
+    private void PauseGame(bool pause)
+    {
+        StopPlane(pause);
+        if (isGamePaused)
+        {
+            //if (state == GameState.MainGame)
+            //{
+            ControllersMenu(true);
+            //}
+        }
+        else
+        {
+            //if (state == GameState.MainGame)
+            //{
+            ControllersMenu(false);
+            //}
+                
+        }
         //if(isGamePaused)
         //{
         //    // Print the rules
@@ -105,8 +172,9 @@ public class GameManager : MonoBehaviour
         }
         if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
         {
+            //targetLogo.enabled = true;
             MainGameStage++;
-            PauseGame(false);
+            StopPlane(false);
         }
     }
 
@@ -138,28 +206,36 @@ public class GameManager : MonoBehaviour
         switch (TutorialStage)
         {
             case 0:
-                PauseGame(true);
+                //PauseGame(true);
+                StopPlane(true);
                 hitTargetScript.SetTarget("TelAviv");
                 instructions.fontSize = 30;
-                instructions.text = "Welcome to TargetDrop!";
+                //instructions.text = "Welcome to TargetDrop!";
                 isEnterPressedYet();
                 break;
             case 1:
-
-                instructions.fontSize = 19;
-                instructions.alignment = TextAlignmentOptions.Top;
-                instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
-                    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
-                    "S - boost speed \r\n P - pause game";
+                background.enabled = false;
+                gameLogo.enabled = false;
+                //instructions.fontSize = 19;
+                //instructions.alignment = TextAlignmentOptions.Top;
+                //instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
+                //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
+                //    "S - boost speed \r\n P - pause game";
+                ControllersMenu(true);
                 isEnterPressedYet();
                 break;
             case 2:
-                instructions.alignment = TextAlignmentOptions.Top;
-                background.enabled = false;
-                next.enabled = false;
+                ControllersMenu(false);
+                next.text = "press P to \r\ncontinue";
+                //background.enabled = false;
+                //InstructionsBackground.enabled = false;
+                //next.enabled = false;
+                //instructions.enabled = true;
                 instructions.fontSize = 20;
+                instructions.alignment = TextAlignmentOptions.Top;
                 instructions.text = "Try dropping delivery on Tel Aviv\r\nin less then 5 km distance!";
-                PauseGame(false);
+                //PauseGame(false);
+                StopPlane(false);
                 TutorialStage++;
                 //UpdateGameState(GameState.Tutorialplay);
                 break;
@@ -179,11 +255,15 @@ public class GameManager : MonoBehaviour
                 isEnterPressedYet();
                 break;
             case 1:
+                instructions.enabled = false;
                 player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
                 player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
-                instructions.text = "Drop on : " + cities[Index_city].name;
+                //instructions.text = "Drop on : " + cities[Index_city].name;
                 hitTargetScript.SetTarget(cities[Index_city].name);
                 targetText.text = "Target: " + cities[Index_city].name;
+                targetText.enabled = true;
+                targetLogo.enabled = true;
+                MissedOrHit.enabled = true;
                 MainGameStage++;
                 break;
             case 2:
@@ -203,9 +283,9 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                StopPlane(true);
                 instructions.text = "Good job! You Droped on the target! \r\n Press enter to begin the game!";
                 UpdateGameState(GameState.MainGame);
-                PauseGame(true);
                 telAvivArrow.SetActive(false);
                 return;
             }
@@ -215,23 +295,28 @@ public class GameManager : MonoBehaviour
         {
             if (distance > 5)
             {
-                instructions.text = "You missed by : " + distance.ToString("F2") + " km,\r\n try hitting closer!";
+                MissedOrHit.text = "Missed by : " + distance.ToString("F2") + " km\r\n";
                 return;
             }
             else
             {
+                MissedOrHit.text = "";
                 Index_city++;
                 if (Index_city < cities.Length)
                 {
                     hitTargetScript.SetTarget(cities[Index_city].name);
-                    instructions.text = "Good job. \r\n next target: " + cities[Index_city].name;
                     targetText.text = "Target: " + cities[Index_city].name;
+                    //MissedOrHit.text = "Good job. \r\n next target: " + cities[Index_city].name;
+                    //targetText.text = "Target: " + cities[Index_city].name;
                 }
                 else
                 {
                     instructions.text = "Good job! you passed the first level!";
-                    targetText.text = "";
-                    PauseGame(true);
+                    instructions.enabled = true;
+                    targetText.enabled = false;
+                    targetLogo.enabled = false;
+                    MissedOrHit.enabled = false;
+                    StopPlane(true);
                 }
                 return;
             }

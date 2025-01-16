@@ -21,18 +21,30 @@ public class MovePlayer : MonoBehaviour
     GameObject plane;
 
     public float maxRotationUD;
-    public float rotationSpeedUD;
+    //public float rotationSpeedUD;
+    private float rotationSpeedUD1 = 5;
+    private float rotationSpeedUD2 = 5;
+    private float rotationSpeedUD3 = 5;
+    private float rotationSpeedUD4 = 5;
     private float currentRotationUD = 0;
 
     public float maxRotationRL;
     public float rotationSpeedRL;
+    private float rotationSpeedRL1;
+    private float rotationSpeedRL2;
+    private float rotationSpeedRL3;
+    private float rotationSpeedRL4;
     private float currentRotationRL = 0;
+
+    public float graphicAcceleration;
+   public float graphicStartingSpeed;
 
     public float rotationSpeedSpin;
 
     public float maxBoost;
     public float BoostSpeed;
     private float currentBoost = 0;
+    public float boostAnimate;
 
     bool spinMore = false;
 
@@ -73,7 +85,7 @@ public class MovePlayer : MonoBehaviour
             {
                 //if (currentBoost < maxBoost)
                 //{
-                //    float boostAnimate = BoostSpeed * Time.deltaTime;
+                //    boostAnimate = BoostSpeed * Time.deltaTime;
                 //    //plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z * boostAnimate);
                 //    plane.transform.Translate(Vector3.forward * boostAnimate);
                 //    currentBoost += boostAnimate;
@@ -84,7 +96,7 @@ public class MovePlayer : MonoBehaviour
             {
                 //if (currentBoost > 0)
                 //{
-                //    float boostAnimate = BoostSpeed * Time.deltaTime;
+                //    boostAnimate = BoostSpeed * Time.deltaTime;
                 //    plane.transform.Translate(Vector3.back * boostAnimate);
                 //    currentBoost -= boostAnimate;
                 //}
@@ -94,20 +106,27 @@ public class MovePlayer : MonoBehaviour
             // Move player up and down
             if (movement.y != 0)
             {
+                rotationSpeedUD3 = graphicStartingSpeed;
+                rotationSpeedUD4 = graphicStartingSpeed;
                 if (movement.y > 0)
                 {
                     if (currentRotationUD < maxRotationUD)
                     {
-                        float rotation = rotationSpeedUD * Time.deltaTime;
+                        // Gradually increase the rotation speed (acceleration)
+                        rotationSpeedUD1 += graphicAcceleration * Time.deltaTime;/////
+
+                        float rotation = rotationSpeedUD1 * Time.deltaTime;
                         plane.transform.Rotate(Vector3.right, rotation, Space.Self);
                         currentRotationUD += rotation;
                     }
                 }
                 else
                 {
+                    
                     if (currentRotationUD > -maxRotationUD)
                     {
-                        float rotation = rotationSpeedUD * Time.deltaTime;
+                        rotationSpeedUD2 += graphicAcceleration * Time.deltaTime;
+                        float rotation = rotationSpeedUD2 * Time.deltaTime;
                         plane.transform.Rotate(Vector3.left, rotation, Space.Self);
                         currentRotationUD -= rotation;
                     }
@@ -116,15 +135,19 @@ public class MovePlayer : MonoBehaviour
             }
             else
             {
-                if (currentRotationUD > Starting_rotation.x + 0.5)
+                rotationSpeedUD1 = graphicStartingSpeed;
+                rotationSpeedUD2 = graphicStartingSpeed;
+                if (currentRotationUD > Starting_rotation.x + 1)
                 {
-                    float rotation = rotationSpeedUD * Time.deltaTime;
+                    rotationSpeedUD3 += graphicAcceleration * Time.deltaTime;/////
+                    float rotation = rotationSpeedUD3 * Time.deltaTime;
                     plane.transform.Rotate(Vector3.left, rotation, Space.Self);
                     currentRotationUD -= rotation;
                 }
-                else if (currentRotationUD < Starting_rotation.x - 0.5)
+                else if (currentRotationUD < Starting_rotation.x - 1)
                 {
-                    float rotation = rotationSpeedUD * Time.deltaTime;
+                    rotationSpeedUD4 += graphicAcceleration * Time.deltaTime;/////
+                    float rotation = rotationSpeedUD4 * Time.deltaTime;
                     plane.transform.Rotate(Vector3.right, rotation, Space.Self);
                     currentRotationUD += rotation;
                 }
@@ -133,9 +156,12 @@ public class MovePlayer : MonoBehaviour
             // Move player left and right
             if (movement.x != 0)
             {
+                rotationSpeedRL3 = graphicStartingSpeed;
+                rotationSpeedRL4 = graphicStartingSpeed;
                 if (shiftHeld)
                 {
                     rb.AddTorque(transform.forward * turnspeed * -movement.x);  // Spin the plane
+                    spinMore = true;
                 }
                 else
                 {
@@ -143,7 +169,8 @@ public class MovePlayer : MonoBehaviour
                     {
                         if (currentRotationRL < maxRotationRL)
                         {
-                            float rotation = rotationSpeedRL * Time.deltaTime;
+                            rotationSpeedRL1 += graphicAcceleration * Time.deltaTime;/////
+                            float rotation = rotationSpeedRL1 * Time.deltaTime;
                             plane.transform.Rotate(Vector3.up, rotation, Space.Self);
                             currentRotationRL += rotation;
                             spinMore = false;
@@ -153,7 +180,8 @@ public class MovePlayer : MonoBehaviour
                     {
                         if (currentRotationRL > -maxRotationRL)
                         {
-                            float rotation = rotationSpeedRL * Time.deltaTime;
+                            rotationSpeedRL2 += graphicAcceleration * Time.deltaTime;/////
+                            float rotation = rotationSpeedRL2 * Time.deltaTime;
                             plane.transform.Rotate(Vector3.down, rotation, Space.Self);
                             currentRotationRL -= rotation;
                             spinMore = false;
@@ -164,17 +192,21 @@ public class MovePlayer : MonoBehaviour
             }
             else
             {
+                rotationSpeedRL1 = graphicStartingSpeed;
+                rotationSpeedRL2 = graphicStartingSpeed;
                 spinMore = true;
-                if (currentRotationRL > Starting_rotation.y + 0.5)
+                if (currentRotationRL > Starting_rotation.y + 1)
                 {
-                    float rotation = rotationSpeedRL * Time.deltaTime;
+                    rotationSpeedRL3 += graphicAcceleration * Time.deltaTime;/////
+                    float rotation = rotationSpeedRL3 * Time.deltaTime;
                     plane.transform.Rotate(Vector3.down, rotation, Space.Self);
                     currentRotationRL -= rotation;
                     spinMore = false;
                 }
-                else if (currentRotationRL < Starting_rotation.y - 0.5)
+                else if (currentRotationRL < Starting_rotation.y - 1)
                 {
-                    float rotation = rotationSpeedRL * Time.deltaTime;
+                    rotationSpeedRL4 += graphicAcceleration * Time.deltaTime;/////
+                    float rotation = rotationSpeedRL4 * Time.deltaTime;
                     plane.transform.Rotate(Vector3.up, rotation, Space.Self);
                     currentRotationRL += rotation;
                     spinMore = false;
@@ -190,23 +222,23 @@ public class MovePlayer : MonoBehaviour
                 if (localyRotation > 180)
                     localyRotation -= 360;
 
-                if (localZRotation > Starting_rotation.z + 0.5)
+                if (localZRotation > Starting_rotation.z + 1)
                 {
                     float rotation = rotationSpeedSpin * Time.deltaTime;
                     plane.transform.Rotate(Vector3.back, rotation, Space.Self);
                 }
-                else if (localZRotation < Starting_rotation.z - 0.5)
+                else if (localZRotation < Starting_rotation.z - 1)
                 {
                     float rotation = rotationSpeedSpin * Time.deltaTime;
                     plane.transform.Rotate(Vector3.forward, rotation, Space.Self);
                 }
 
-                if (localyRotation > Starting_rotation.y + 0.5 && spinMore)
+                if (localyRotation > Starting_rotation.y + 1 && spinMore)
                 {
                     float rotation = rotationSpeedRL * Time.deltaTime;
                     plane.transform.Rotate(Vector3.down, rotation, Space.Self);
                 }
-                else if (localyRotation < Starting_rotation.y - 0.5 && spinMore)
+                else if (localyRotation < Starting_rotation.y - 1 && spinMore)
                 {
                     float rotation = rotationSpeedRL * Time.deltaTime;
                     plane.transform.Rotate(Vector3.up, rotation, Space.Self);
