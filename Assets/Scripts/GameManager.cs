@@ -4,8 +4,8 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
-using Mono.Cecil.Cil;
-using static System.Net.Mime.MediaTypeNames;
+using UnityEngine.Audio;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -32,6 +32,10 @@ public class GameManager : MonoBehaviour
     public RawImage background;
     public RawImage InstructionsBackground;
 
+    // Soundtracks
+    public AudioSource engineAudio;
+    public AudioSource backgroundMusic;
+
     // Location objects
     public GameObject[] cities;
 
@@ -57,6 +61,7 @@ public class GameManager : MonoBehaviour
         //hitTarget = map.GetComponent<HitTarget>();
         //hitTargetScript = map.GetComponent<HitTarget>();
         //PauseGame(true);
+        backgroundMusic.Play();
         targetText.enabled = false;
         targetLogo.enabled = false;
         MissedOrHit.enabled = false;
@@ -118,6 +123,14 @@ public class GameManager : MonoBehaviour
     private void StopPlane(bool shouldStop)
     {
         isGamePaused = shouldStop;
+        if (shouldStop)
+        {
+            engineAudio.Pause();
+        }
+        else
+        {
+            engineAudio.Play();
+        }
         movePlayerScript.ActiveControllers = !isGamePaused;
         spawnerScript.enabled = !isGamePaused;
 
@@ -206,7 +219,6 @@ public class GameManager : MonoBehaviour
         switch (TutorialStage)
         {
             case 0:
-                //PauseGame(true);
                 StopPlane(true);
                 hitTargetScript.SetTarget("TelAviv");
                 instructions.fontSize = 30;
@@ -216,28 +228,18 @@ public class GameManager : MonoBehaviour
             case 1:
                 background.enabled = false;
                 gameLogo.enabled = false;
-                //instructions.fontSize = 19;
-                //instructions.alignment = TextAlignmentOptions.Top;
-                //instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
-                //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
-                //    "S - boost speed \r\n P - pause game";
                 ControllersMenu(true);
                 isEnterPressedYet();
                 break;
             case 2:
                 ControllersMenu(false);
                 next.text = "press P to \r\ncontinue";
-                //background.enabled = false;
-                //InstructionsBackground.enabled = false;
-                //next.enabled = false;
-                //instructions.enabled = true;
                 instructions.fontSize = 20;
                 instructions.alignment = TextAlignmentOptions.Top;
                 instructions.text = "Try dropping delivery on Tel Aviv\r\nin less then 5 km distance!";
-                //PauseGame(false);
                 StopPlane(false);
+                engineAudio.Play();
                 TutorialStage++;
-                //UpdateGameState(GameState.Tutorialplay);
                 break;
             case 3:
                 // Here i want the code to skip othor options and wait for target hit

@@ -43,7 +43,7 @@ public class MovePlayer : MonoBehaviour
 
     public float maxBoost;
     public float BoostSpeed;
-    private float currentBoost = 0;
+    //private float currentBoost = 0;
     public float boostAnimate;
 
     bool spinMore = false;
