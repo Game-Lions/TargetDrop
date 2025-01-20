@@ -1,8 +1,10 @@
 # TargetDrop
 itch.io - https://michibinyamin.itch.io/target-drop
-מהות המשחק : המשחק "הצנחת יעד" מתמקד בבחינת ידיעת הארץ של השחקן. השחקן יטיס מטוס על מפת ישראל ויצניח חבילה בניסיון להגיע למיקום יעד ספציפי. המשחק מציע חווית למידה מהנה, המשלבת אתגרי ניווט ומיקוד.    
+Game Concept:
+The game "Target Drop" focuses on testing the player's knowledge of Israel. The player pilots a plane over a map of Israel and drops a package, aiming to reach a specific target location. The game offers an enjoyable learning experience, combining navigation challenges and precision.    
 ![Alt text](drop_plane.webp)    
-שמות חברי הצוות: מיכאל בנימין ועדי יוחנן
+Team Members:    
+Michael Binyamin and Adi Yohanan
 
-[לפירות רכיבים רשמיים וסקר שוק](formal-elements.md)    
-[לתרשים UML](UML_game.pdf)
+[For official components and market research](formal-elements.md)    
+[For the UML diagram](UML_game.pdf)
