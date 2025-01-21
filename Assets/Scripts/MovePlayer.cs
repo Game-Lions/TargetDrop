@@ -22,7 +22,7 @@ public class MovePlayer : MonoBehaviour
     public float maxSpeed;
     public float accelerationSpeed;
     public RawImage Speedometer;
-   //private float SpeedometerSize;
+    //private float SpeedometerSize;
 
     [SerializeField]
     GameObject plane;
@@ -111,7 +111,7 @@ public class MovePlayer : MonoBehaviour
                 //SpeedometerPointer.transform.GetChild(0).rectTransform.position += new Vector3(0, 0.5f, 0);
                 //Speedometer.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition += new Vector2(0, 0.5f);
             }
-            else if(Speedandspin.y < 0 && speed > 1f)
+            else if (Speedandspin.y < 0 && speed > 1f)
             {
                 speed -= accelerationSpeed;
                 //SpeedometerPointer.rectTransform.position += new Vector3(0, -0.5f, 0);
@@ -193,29 +193,29 @@ public class MovePlayer : MonoBehaviour
                 //}
                 //else
                 //{
-                    if (movement.x > 0)
+                if (movement.x > 0)
+                {
+                    if (currentRotationRL < maxRotationRL)
                     {
-                        if (currentRotationRL < maxRotationRL)
-                        {
-                            rotationSpeedRL1 += graphicAcceleration * Time.deltaTime;/////
-                            float rotation = rotationSpeedRL1 * Time.deltaTime;
-                            plane.transform.Rotate(Vector3.up, rotation, Space.Self);
-                            currentRotationRL += rotation;
-                            spinMore = false;
-                        }
+                        rotationSpeedRL1 += graphicAcceleration * Time.deltaTime;/////
+                        float rotation = rotationSpeedRL1 * Time.deltaTime;
+                        plane.transform.Rotate(Vector3.up, rotation, Space.Self);
+                        currentRotationRL += rotation;
+                        spinMore = false;
                     }
-                    else
+                }
+                else
+                {
+                    if (currentRotationRL > -maxRotationRL)
                     {
-                        if (currentRotationRL > -maxRotationRL)
-                        {
-                            rotationSpeedRL2 += graphicAcceleration * Time.deltaTime;/////
-                            float rotation = rotationSpeedRL2 * Time.deltaTime;
-                            plane.transform.Rotate(Vector3.down, rotation, Space.Self);
-                            currentRotationRL -= rotation;
-                            spinMore = false;
-                        }
+                        rotationSpeedRL2 += graphicAcceleration * Time.deltaTime;/////
+                        float rotation = rotationSpeedRL2 * Time.deltaTime;
+                        plane.transform.Rotate(Vector3.down, rotation, Space.Self);
+                        currentRotationRL -= rotation;
+                        spinMore = false;
                     }
-                    rb.AddTorque(transform.up * turnspeed * movement.x);      // Turn the plane
+                }
+                rb.AddTorque(transform.up * turnspeed * movement.x);      // Turn the plane
                 //}
             }
             else
@@ -292,7 +292,7 @@ public class MovePlayer : MonoBehaviour
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         transform.position = new Vector3(-117.11f, -0.08f, -193.58f);
-        transform.rotation = Quaternion.Euler(0,208.1f, 0);
+        transform.rotation = Quaternion.Euler(0, 208.1f, 0);
     }
 
 }

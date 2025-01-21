@@ -374,7 +374,7 @@ public class GameManager : MonoBehaviour
                 MissedOrHit.text = "";
                 Index_city++;
                 if (Index_city < cities.Length)
-                { 
+                {
                     hitTargetScript.SetTarget(cities[Index_city].name);
                     targetText.text = "Target: " + cities[Index_city].name;
                     //MissedOrHit.text = "Good job. \r\n next target: " + cities[Index_city].name;
@@ -403,9 +403,10 @@ public class GameManager : MonoBehaviour
         movePlayerScript.respawn();
     }
 
-        private void visibleTargets(bool visible)
+    private void visibleTargets(bool visible)
     {
-        if (visible) { 
+        if (visible)
+        {
             for (int i = 0; i < cities.Length; i++)
             {
                 cities[i].transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
@@ -443,7 +444,7 @@ public class GameManager : MonoBehaviour
             timerText.enabled = true;
         }
         yield return new WaitForSeconds(2); // Wait for 2 seconds
-        if(state == GameState.Tutorial)
+        if (state == GameState.Tutorial)
         {
             instructions.enabled = true;
         }
