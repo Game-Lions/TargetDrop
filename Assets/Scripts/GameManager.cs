@@ -1,10 +1,15 @@
 using UnityEngine;
+using System.Collections;
 using TMPro;
 //using UnityEngine.UIElements;
+
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using UnityEngine.Audio;
+using UnityEditor.Experimental.GraphView;
+using System;
+using Mono.Cecil.Cil;
 
 
 public class GameManager : MonoBehaviour
@@ -12,9 +17,11 @@ public class GameManager : MonoBehaviour
     public static GameManager instance; // Singleton instance
 
     // Game objects
-    [SerializeField] private GameObject map;
+    // [SerializeField] private GameObject map;
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject telAvivArrow;
+    [SerializeField] private GameObject telAvivText;
+    private bool planeCrash = false;
 
     // Game scripts
     [SerializeField] private HitTarget hitTargetScript;
@@ -27,23 +34,35 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI next;
     public TextMeshProUGUI MissedOrHit;
     public TextMeshProUGUI targetText;
+    public TextMeshProUGUI timerText;
     public RawImage targetLogo;
     public RawImage gameLogo;
     public RawImage background;
     public RawImage InstructionsBackground;
+    public RawImage Speedometer;
+    public RawImage SpeedometerP;
 
     // Soundtracks
     public AudioSource engineAudio;
     public AudioSource backgroundMusic;
 
     // Location objects
-    public GameObject[] cities;
+    private GameObject[] cities;
+    public GameObject citiesObject;
 
     // Manager Game state
     private GameState state = GameState.Tutorial;
     private int TutorialStage = 0;
     private int MainGameStage = 0;
     public bool isGamePaused = true;
+
+    // MiniMap
+    public RawImage miniMapBackground;
+    public RawImage miniMap;
+    public RawImage miniMapPlayer;
+
+    // StopWatch
+    public Stopwatch watch;
 
     // General
     private int Index_city = 0;
@@ -62,6 +81,11 @@ public class GameManager : MonoBehaviour
         //hitTargetScript = map.GetComponent<HitTarget>();
         //PauseGame(true);
         backgroundMusic.Play();
+        miniMap.enabled = false;
+        miniMapBackground.enabled = false;
+        miniMapPlayer.enabled = false;
+        Speedometer.enabled = false;
+        SpeedometerP.enabled = false;
         targetText.enabled = false;
         targetLogo.enabled = false;
         MissedOrHit.enabled = false;
@@ -69,6 +93,9 @@ public class GameManager : MonoBehaviour
         instructions.enabled = false;
         controllers.enabled = false;
         UpdateGameState(GameState.Tutorial);
+
+        getTargets();
+        visibleTargets(false);
     }
     public void UpdateGameState(GameState newState)
     {
@@ -89,6 +116,11 @@ public class GameManager : MonoBehaviour
     {
         if (activate)
         {
+            miniMap.enabled = false;
+            miniMapBackground.enabled = false;
+            miniMapPlayer.enabled = false;
+            SpeedometerP.enabled = false;
+            Speedometer.enabled = false;
             targetLogo.enabled = false;
             targetText.enabled = false;
             MissedOrHit.enabled = false;
@@ -102,6 +134,8 @@ public class GameManager : MonoBehaviour
             //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
             //    "S - boost speed \r\n P - pause game";
             next.enabled = true;
+            watch.StopStopwatch();
+            watch.timerText.enabled = false;
         }
         else
         {
@@ -110,11 +144,18 @@ public class GameManager : MonoBehaviour
                 targetLogo.enabled = true;
                 targetText.enabled = true;
                 MissedOrHit.enabled = true;
+                watch.StartStopwatch();
+                watch.timerText.enabled = true;
             }
             else if (state == GameState.Tutorial)
             {
                 instructions.enabled = true;
             }
+            miniMap.enabled = true;
+            miniMapBackground.enabled = true;
+            miniMapPlayer.enabled = true;
+            Speedometer.enabled = true;
+            SpeedometerP.enabled = true;
             next.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
@@ -189,6 +230,12 @@ public class GameManager : MonoBehaviour
             MainGameStage++;
             StopPlane(false);
         }
+        //if (planeCrash && Input.GetKeyDown(KeyCode.Return))
+        //{
+        //    planeCrash = false;
+        //    StopPlane(false);
+
+        //}
     }
 
     public void Update()
@@ -212,6 +259,13 @@ public class GameManager : MonoBehaviour
             PauseGame(isGamePaused);
         }
 
+        // Stop and wait for restart
+        if (planeCrash)
+        {
+            //StopPlane(true);
+            //isEnterPressedYet();
+        }
+
     }
 
     private void Tutorial()
@@ -221,6 +275,7 @@ public class GameManager : MonoBehaviour
             case 0:
                 StopPlane(true);
                 hitTargetScript.SetTarget("TelAviv");
+                telAvivText.SetActive(true);
                 instructions.fontSize = 30;
                 //instructions.text = "Welcome to TargetDrop!";
                 isEnterPressedYet();
@@ -233,6 +288,8 @@ public class GameManager : MonoBehaviour
                 break;
             case 2:
                 ControllersMenu(false);
+                Speedometer.enabled = true;
+                SpeedometerP.enabled = true;
                 next.text = "press P to \r\ncontinue";
                 instructions.fontSize = 20;
                 instructions.alignment = TextAlignmentOptions.Top;
@@ -257,9 +314,20 @@ public class GameManager : MonoBehaviour
                 isEnterPressedYet();
                 break;
             case 1:
+                // getTargets();    
+                visibleTargets(true);
+                watch.StartStopwatch();
+                watch.timerText.enabled = true;
                 instructions.enabled = false;
-                player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
-                player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
+                //Rigidbody rb = player.transform.GetComponent<Rigidbody>();
+                //// Reset velocity and angular velocity
+                //rb.linearVelocity = Vector3.zero;
+                //rb.angularVelocity = Vector3.zero;
+                //player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
+                //player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
+
+                movePlayerScript.respawn();
+
                 //instructions.text = "Drop on : " + cities[Index_city].name;
                 hitTargetScript.SetTarget(cities[Index_city].name);
                 targetText.text = "Target: " + cities[Index_city].name;
@@ -302,10 +370,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                StartCoroutine(TimerText());
                 MissedOrHit.text = "";
                 Index_city++;
                 if (Index_city < cities.Length)
-                {
+                { 
                     hitTargetScript.SetTarget(cities[Index_city].name);
                     targetText.text = "Target: " + cities[Index_city].name;
                     //MissedOrHit.text = "Good job. \r\n next target: " + cities[Index_city].name;
@@ -314,6 +383,7 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     instructions.text = "Good job! you passed the first level!";
+                    watch.StopStopwatch();
                     instructions.enabled = true;
                     targetText.enabled = false;
                     targetLogo.enabled = false;
@@ -324,6 +394,62 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public void PlaneCrash()
+    {
+        Debug.Log("Plane crash!");
+        planeCrash = true;
+        StartCoroutine(TimerText());
+        movePlayerScript.respawn();
+    }
+
+        private void visibleTargets(bool visible)
+    {
+        if (visible) { 
+            for (int i = 0; i < cities.Length; i++)
+            {
+                cities[i].transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < cities.Length; i++)
+            {
+                cities[i].transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void getTargets()
+    {
+        //Debug.Log(citiesObject.transform.childCount);
+        cities = new GameObject[citiesObject.transform.childCount];
+        for (int i = 0; i < citiesObject.transform.childCount; i++)
+        {
+            cities[i] = citiesObject.transform.GetChild(i).gameObject;
+        }
+    }
+    IEnumerator TimerText()
+    {
+        if (planeCrash)
+        {
+            timerText.text = "Plane Crash!\nTry again";
+            instructions.enabled = false;
+            timerText.enabled = true;
+        }
+        else
+        {
+            timerText.text = "Good Job!";
+            timerText.enabled = true;
+        }
+        yield return new WaitForSeconds(2); // Wait for 2 seconds
+        if(state == GameState.Tutorial)
+        {
+            instructions.enabled = true;
+        }
+        timerText.enabled = false;
+        planeCrash = false;
+    }
 }
 
 public enum GameState
@@ -331,6 +457,7 @@ public enum GameState
     Menu,
     Tutorial,
     MainGame,
+    //PlaneCrash,
     pause,
     none
 }

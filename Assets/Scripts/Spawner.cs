@@ -9,6 +9,7 @@ public class Spawner : MonoBehaviour
     public float throwForce;
     private bool canDrop = true;    // A flag to prevent multiple drops during the cooldown
     public float timeBetweenEachDrop;
+    public AudioSource dropSound;
 
     private void OnEnable()
     {
@@ -26,8 +27,8 @@ public class Spawner : MonoBehaviour
     {
         if (canDrop)
         {
+            dropSound.Play();
             canDrop = false;  // Prevent dropping during cooldown
-
             GameObject parentObject = transform.parent.gameObject;
             GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
             // Apply a force or velocity to throw the object forward
@@ -44,7 +45,6 @@ public class Spawner : MonoBehaviour
                 //Vector3 combinedDirection = forwardDirection + upwardDirection;
                 //rb.AddForce(forwardDirection.normalized * throwForce, ForceMode.VelocityChange);
             }
-
             StartCoroutine(StartCooldown());
         }
     }

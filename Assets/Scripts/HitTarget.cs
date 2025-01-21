@@ -5,6 +5,7 @@ public class HitTarget : MonoBehaviour
 {
     // Keep track of the current target
     private GameObject target;
+    [SerializeField] private MovePlayer movePlayerScript;
     private void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Spawner"))
@@ -21,7 +22,9 @@ public class HitTarget : MonoBehaviour
         }
         if (other.gameObject.CompareTag("Player"))
         {
-            Debug.Log("Player crash!");
+            GameManager.instance.PlaneCrash();
+            //Debug.Log("Player crash!");
+            //movePlayerScript.respawn();
         }
     }
     public void SetTarget(string targetName)
