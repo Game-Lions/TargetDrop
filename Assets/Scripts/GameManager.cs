@@ -142,7 +142,7 @@ public class GameManager : MonoBehaviour
             MissedOrHit.enabled = false;
             instructions.enabled = false;
             InstructionsBackground.enabled = true;
-            muteAndPlay.enabled= true;
+            muteAndPlay.enabled = true;
             //instructions.enabled = true;
             //instructions.fontSize = 19;
             //instructions.alignment = TextAlignmentOptions.Top;
@@ -225,7 +225,8 @@ public class GameManager : MonoBehaviour
         if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
         {
             // Called between each level
-            if (MainGameStage == 0) { 
+            if (MainGameStage == 0)
+            {
                 MainGameStage++;
             }
             StopPlane(false);
@@ -393,16 +394,16 @@ public class GameManager : MonoBehaviour
 
     private void setTimerByDistance()
     {
-            timer.timerText.enabled = true;
-            float distanceFromTarget = Vector3.Distance(player.transform.position, CurrentTargets[Index_city].transform.position);
+        timer.timerText.enabled = true;
+        float distanceFromTarget = Vector3.Distance(player.transform.position, CurrentTargets[Index_city].transform.position);
 
-            // Apply a non-linear adjustment to the distance
-            float adjustedTime = Mathf.Log(1 + distanceFromTarget) * scaleFactor; // Udjust scaleFactor instead
+        // Apply a non-linear adjustment to the distance
+        float adjustedTime = Mathf.Log(1 + distanceFromTarget) * scaleFactor; // Udjust scaleFactor instead
 
-            timer.setTimer(adjustedTime); // Adjusted time based on the function
-            timer.StartTimer();
-            timer.timerText.enabled = true;
-        
+        timer.setTimer(adjustedTime); // Adjusted time based on the function
+        timer.StartTimer();
+        timer.timerText.enabled = true;
+
 
     }
 
