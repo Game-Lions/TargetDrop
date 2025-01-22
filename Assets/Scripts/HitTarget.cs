@@ -27,6 +27,15 @@ public class HitTarget : MonoBehaviour
             //movePlayerScript.respawn();
         }
     }
+
+    void OnTriggerExit(Collider other)
+    {
+        // Rotate the player 180 degrees
+        //other.transform.Rotate(0, 180, 0);
+        other.transform.parent.Rotate(0, 180, 0);
+    }
+
+
     public void SetTarget(string targetName)
     {
         this.target = GameObject.Find(targetName);

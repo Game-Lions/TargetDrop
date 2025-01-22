@@ -1,13 +1,24 @@
+//using UnityEngine;
+//using System.Collections;
+//using TMPro;
+////using UnityEngine.UIElements;
+
+//using UnityEngine.UI;
+//using UnityEngine.InputSystem;
+//using UnityEngine.UIElements;
+//using UnityEngine.Audio;
+//using System;
+////using static UnityEngine.GraphicsBuffer;
+//using System.Collections.Generic;
+
 using UnityEngine;
 using System.Collections;
 using TMPro;
-//using UnityEngine.UIElements;
-
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
-using UnityEngine.UIElements;
 using UnityEngine.Audio;
-using System;
+using System.Collections.Generic;
+
 
 
 public class GameManager : MonoBehaviour
@@ -33,6 +44,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI MissedOrHit;
     public TextMeshProUGUI targetText;
     public TextMeshProUGUI timerText;
+    public TextMeshProUGUI muteAndPlay;
     public RawImage targetLogo;
     public RawImage gameLogo;
     public RawImage background;
@@ -45,8 +57,9 @@ public class GameManager : MonoBehaviour
     public AudioSource backgroundMusic;
 
     // Location objects
-    private GameObject[] cities;
-    public GameObject citiesObject;
+    private GameObject[] CurrentTargets;
+    public GameObject[] Levels;
+    private int Level = 0;
 
     // Manager Game state
     private GameState state = GameState.Tutorial;
@@ -60,10 +73,14 @@ public class GameManager : MonoBehaviour
     public RawImage miniMapPlayer;
 
     // StopWatch
-    public Stopwatch watch;
+    //public Stopwatch watch;
+
+    // Timer
+    public Timer timer;
 
     // General
     private int Index_city = 0;
+    public float scaleFactor;
 
     private void Awake()
     {
@@ -90,9 +107,10 @@ public class GameManager : MonoBehaviour
         InstructionsBackground.enabled = false;
         instructions.enabled = false;
         controllers.enabled = false;
+        muteAndPlay.enabled = false;
         UpdateGameState(GameState.Tutorial);
 
-        getTargets();
+        getTargets(Levels[0]);
         visibleTargets(false);
     }
     public void UpdateGameState(GameState newState)
@@ -124,6 +142,7 @@ public class GameManager : MonoBehaviour
             MissedOrHit.enabled = false;
             instructions.enabled = false;
             InstructionsBackground.enabled = true;
+            muteAndPlay.enabled= true;
             //instructions.enabled = true;
             //instructions.fontSize = 19;
             //instructions.alignment = TextAlignmentOptions.Top;
@@ -132,8 +151,11 @@ public class GameManager : MonoBehaviour
             //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
             //    "S - boost speed \r\n P - pause game";
             next.enabled = true;
-            watch.StopStopwatch();
-            watch.timerText.enabled = false;
+
+            timer.StopTimer();
+            timer.timerText.enabled = false;
+            //watch.StopStopwatch();
+            //watch.timerText.enabled = false;
         }
         else
         {
@@ -142,8 +164,11 @@ public class GameManager : MonoBehaviour
                 targetLogo.enabled = true;
                 targetText.enabled = true;
                 MissedOrHit.enabled = true;
-                watch.StartStopwatch();
-                watch.timerText.enabled = true;
+
+                timer.StartTimer();
+                timer.timerText.enabled = true;
+                //watch.StartStopwatch();
+                //watch.timerText.enabled = true;
             }
             else if (state == GameState.Tutorial)
             {
@@ -157,6 +182,7 @@ public class GameManager : MonoBehaviour
             next.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
+            muteAndPlay.enabled = false;
         }
     }
     private void StopPlane(bool shouldStop)
@@ -183,39 +209,13 @@ public class GameManager : MonoBehaviour
         StopPlane(pause);
         if (isGamePaused)
         {
-            //if (state == GameState.MainGame)
-            //{
             ControllersMenu(true);
-            //}
         }
         else
         {
-            //if (state == GameState.MainGame)
-            //{
             ControllersMenu(false);
-            //}
-
         }
-        //if(isGamePaused)
-        //{
-        //    // Print the rules
-        //    instructions.text = "How to fly?\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
-        //            "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
-        //            "S - boost speed \r\n P - pause game";
-        //}
-        //else
-        //{
-        //    if (state == GameState.Tutorial)
-        //    {
-        //        instructions.text = "Try dropping delivery on Tel Aviv in less then 5 km distance!";
-        //    }
-        //    else
-        //    {
-        //        instructions.text = "";
-        //    }
-        //}
     }
-
     private void isEnterPressedYet()
     {
         if (state == GameState.Tutorial && Input.GetKeyDown(KeyCode.Return))
@@ -224,16 +224,12 @@ public class GameManager : MonoBehaviour
         }
         if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
         {
-            //targetLogo.enabled = true;
-            MainGameStage++;
+            // Called between each level
+            if (MainGameStage == 0) { 
+                MainGameStage++;
+            }
             StopPlane(false);
         }
-        //if (planeCrash && Input.GetKeyDown(KeyCode.Return))
-        //{
-        //    planeCrash = false;
-        //    StopPlane(false);
-
-        //}
     }
 
     public void Update()
@@ -257,11 +253,17 @@ public class GameManager : MonoBehaviour
             PauseGame(isGamePaused);
         }
 
-        // Stop and wait for restart
-        if (planeCrash)
+        // Check if M key was pressed to play and pause music
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            //StopPlane(true);
-            //isEnterPressedYet();
+            if (backgroundMusic.isPlaying)
+            {
+                backgroundMusic.Pause();
+            }
+            else
+            {
+                backgroundMusic.Play();
+            }
         }
 
     }
@@ -298,7 +300,6 @@ public class GameManager : MonoBehaviour
                 break;
             case 3:
                 // Here i want the code to skip othor options and wait for target hit
-
                 break;
         }
     }
@@ -312,30 +313,20 @@ public class GameManager : MonoBehaviour
                 isEnterPressedYet();
                 break;
             case 1:
-                // getTargets();    
                 visibleTargets(true);
-                watch.StartStopwatch();
-                watch.timerText.enabled = true;
+                setTimerByDistance();
+
                 instructions.enabled = false;
-                //Rigidbody rb = player.transform.GetComponent<Rigidbody>();
-                //// Reset velocity and angular velocity
-                //rb.linearVelocity = Vector3.zero;
-                //rb.angularVelocity = Vector3.zero;
-                //player.transform.position = new Vector3((float)-116.75, (float)0.1, (float)-193.3);
-                //player.transform.rotation = Quaternion.Euler((float)-0.79, (float)-155.37, 0);
-
                 movePlayerScript.respawn();
-
-                //instructions.text = "Drop on : " + cities[Index_city].name;
-                hitTargetScript.SetTarget(cities[Index_city].name);
-                targetText.text = "Target: " + cities[Index_city].name;
+                hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
+                targetText.text = "Target: " + CurrentTargets[Index_city].name;
                 targetText.enabled = true;
                 targetLogo.enabled = true;
                 MissedOrHit.enabled = true;
                 MainGameStage++;
                 break;
             case 2:
-
+                // GamePlay
                 break;
         }
     }
@@ -368,29 +359,51 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                StartCoroutine(TimerText());
                 MissedOrHit.text = "";
                 Index_city++;
-                if (Index_city < cities.Length)
+                if (Index_city < CurrentTargets.Length)
                 {
-                    hitTargetScript.SetTarget(cities[Index_city].name);
-                    targetText.text = "Target: " + cities[Index_city].name;
+                    StartCoroutine(TimerText());
+                    hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
+                    targetText.text = "Target: " + CurrentTargets[Index_city].name;
+                    setTimerByDistance();
                     //MissedOrHit.text = "Good job. \r\n next target: " + cities[Index_city].name;
                     //targetText.text = "Target: " + cities[Index_city].name;
                 }
                 else
                 {
-                    instructions.text = "Good job! you passed the first level!";
-                    watch.StopStopwatch();
+                    instructions.text = "Good job! you passed the first level!\n Press enter for next level";
+                    timer.StopTimer();
+                    //watch.StopStopwatch();
                     instructions.enabled = true;
                     targetText.enabled = false;
                     targetLogo.enabled = false;
                     MissedOrHit.enabled = false;
                     StopPlane(true);
+                    Level++;
+                    Index_city = 0;
+                    getTargets(Levels[Level]);
+                    MainGameStage = 0;
+                    //isEnterPressedYet();
                 }
                 return;
             }
         }
+    }
+
+    private void setTimerByDistance()
+    {
+            timer.timerText.enabled = true;
+            float distanceFromTarget = Vector3.Distance(player.transform.position, CurrentTargets[Index_city].transform.position);
+
+            // Apply a non-linear adjustment to the distance
+            float adjustedTime = Mathf.Log(1 + distanceFromTarget) * scaleFactor; // Udjust scaleFactor instead
+
+            timer.setTimer(adjustedTime); // Adjusted time based on the function
+            timer.StartTimer();
+            timer.timerText.enabled = true;
+        
+
     }
 
     public void PlaneCrash()
@@ -405,29 +418,58 @@ public class GameManager : MonoBehaviour
     {
         if (visible)
         {
-            for (int i = 0; i < cities.Length; i++)
+            for (int i = 0; i < Levels.Length; i++)
             {
-                cities[i].transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+                for (int j = 0; j < Levels[i].transform.childCount; j++)
+                {
+                    GameObject child = Levels[i].transform.GetChild(j).gameObject;
+                    child.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+                }
             }
         }
         else
         {
-            for (int i = 0; i < cities.Length; i++)
+            for (int i = 0; i < Levels.Length; i++)
             {
-                cities[i].transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+                for (int j = 0; j < Levels[i].transform.childCount; j++)
+                {
+                    GameObject child = Levels[i].transform.GetChild(j).gameObject;
+                    child.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+                }
             }
         }
     }
 
-    private void getTargets()
+    private void getTargets(GameObject level)
     {
-        //Debug.Log(citiesObject.transform.childCount);
-        cities = new GameObject[citiesObject.transform.childCount];
-        for (int i = 0; i < citiesObject.transform.childCount; i++)
+        int childCount = level.transform.childCount;
+        CurrentTargets = new GameObject[childCount];
+
+        // Create a list of indices
+        List<int> indices = new List<int>();
+        for (int i = 0; i < childCount; i++)
         {
-            cities[i] = citiesObject.transform.GetChild(i).gameObject;
+            indices.Add(i);
+        }
+
+        // Shuffle the indices
+        for (int i = 0; i < indices.Count; i++)
+        {
+            int randomIndex = Random.Range(i, indices.Count);
+            // Swap the elements
+            int temp = indices[i];
+            indices[i] = indices[randomIndex];
+            indices[randomIndex] = temp;
+        }
+
+        // Assign cities in random order
+        for (int i = 0; i < childCount; i++)
+        {
+            CurrentTargets[i] = level.transform.GetChild(indices[i]).gameObject;
         }
     }
+
+
     IEnumerator TimerText()
     {
         if (planeCrash)
