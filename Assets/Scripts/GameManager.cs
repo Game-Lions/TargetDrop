@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
     public RawImage InstructionsBackground;
     public RawImage Speedometer;
     public RawImage SpeedometerP;
+    public RawImage Compass;
 
     // Soundtracks
     public AudioSource engineAudio;
@@ -101,6 +102,7 @@ public class GameManager : MonoBehaviour
         miniMapPlayer.enabled = false;
         Speedometer.enabled = false;
         SpeedometerP.enabled = false;
+        Compass.enabled = false;
         targetText.enabled = false;
         targetLogo.enabled = false;
         MissedOrHit.enabled = false;
@@ -137,6 +139,7 @@ public class GameManager : MonoBehaviour
             miniMapPlayer.enabled = false;
             SpeedometerP.enabled = false;
             Speedometer.enabled = false;
+            Compass.enabled = false;
             targetLogo.enabled = false;
             targetText.enabled = false;
             MissedOrHit.enabled = false;
@@ -179,6 +182,7 @@ public class GameManager : MonoBehaviour
             miniMapPlayer.enabled = true;
             Speedometer.enabled = true;
             SpeedometerP.enabled = true;
+            Compass.enabled = true;
             next.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
@@ -291,6 +295,7 @@ public class GameManager : MonoBehaviour
                 ControllersMenu(false);
                 Speedometer.enabled = true;
                 SpeedometerP.enabled = true;
+                Compass.enabled = true;
                 next.text = "press P to \r\ncontinue";
                 instructions.fontSize = 20;
                 instructions.alignment = TextAlignmentOptions.Top;
@@ -373,7 +378,8 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    instructions.text = "Good job! you passed the first level!\n Press enter for next level";
+                    float count = Level + 1;
+                    instructions.text = "Good job! you passed level " + count + "\n Press enter for next level";
                     timer.StopTimer();
                     //watch.StopStopwatch();
                     instructions.enabled = true;
@@ -381,7 +387,14 @@ public class GameManager : MonoBehaviour
                     targetLogo.enabled = false;
                     MissedOrHit.enabled = false;
                     StopPlane(true);
-                    Level++;
+                    if (Level < Levels.Length)
+                    {
+                        Level++;
+                    }
+                    else
+                    {
+                        instructions.text = "Congradulations! you Passed all levels";
+                    }
                     Index_city = 0;
                     getTargets(Levels[Level]);
                     MainGameStage = 0;
@@ -403,8 +416,6 @@ public class GameManager : MonoBehaviour
         timer.setTimer(adjustedTime); // Adjusted time based on the function
         timer.StartTimer();
         timer.timerText.enabled = true;
-
-
     }
 
     public void PlaneCrash()
