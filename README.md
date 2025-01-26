@@ -24,4 +24,5 @@ Plane engine sound - (Relaxing White Noise) https://www.youtube.com/watch?v=iYX9
 minimap tutorial + code - (nappin) https://www.youtube.com/watch?v=8YIibBgRj2Q&ab_channel=nappin  
 BlackBars in game (fitting the screen), tutorial + code - (Max O'Didily) https://www.youtube.com/watch?v=PClWqhfQlpU&ab_channel=MaxO%27Didily  
 ### General:  
-ChatGPT, helped for finding bug issues - https://chatgpt.com/
+ChatGPT, helped for finding bug issues + generated our main game photo in the readme - https://chatgpt.com/  
+
