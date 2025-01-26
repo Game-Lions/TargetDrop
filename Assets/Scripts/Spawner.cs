@@ -32,6 +32,7 @@ public class Spawner : MonoBehaviour
             GameObject parentObject = transform.parent.gameObject;
             GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
             // Apply a force or velocity to throw the object forward
+
             Rigidbody rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
             {
@@ -45,6 +46,7 @@ public class Spawner : MonoBehaviour
                 //Vector3 combinedDirection = forwardDirection + upwardDirection;
                 //rb.AddForce(forwardDirection.normalized * throwForce, ForceMode.VelocityChange);
             }
+            obj.transform.rotation = parentObject.transform.rotation;
             StartCoroutine(StartCooldown());
         }
     }
