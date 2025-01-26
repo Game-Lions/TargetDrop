@@ -162,7 +162,7 @@ public class GameManager : MonoBehaviour
             muteAndPlay.enabled = true;
             timer.StopTimer();
             timer.timerText.enabled = false;
-            if(state == GameState.Tutorial && TutorialStage == 5)
+            if (state == GameState.Tutorial && TutorialStage == 5)
             {
                 next.enabled = false;
             }
@@ -207,7 +207,8 @@ public class GameManager : MonoBehaviour
             {
                 instructions.enabled = true;
             }
-            else if (state == GameState.FreeFly) {
+            else if (state == GameState.FreeFly)
+            {
                 targetLogo.enabled = false;
                 targetText.enabled = false;
                 MissedOrHit.enabled = false;
@@ -290,7 +291,7 @@ public class GameManager : MonoBehaviour
             if (MainGameStage == 0)
             {
                 MainGameStage++;
-                
+
             }
             StopPlane(false);
             levelScore.SetActive(false);
@@ -391,7 +392,7 @@ public class GameManager : MonoBehaviour
                 targetLogo.enabled = false;
                 movePlayerScript.respawn();
                 StopPlane(true);
-                if(Level == 0)
+                if (Level == 0)
                 {
                     instructions.enabled = true;
                     instructions.text = "Ready? press enter to begin the game!";
@@ -434,7 +435,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                StopPlane(true);    
+                StopPlane(true);
                 instructions.text = "Good job! You Droped on the target! \r\n Press enter to enter the game manu";
                 TutorialStage++;
                 //PauseGame(true);
