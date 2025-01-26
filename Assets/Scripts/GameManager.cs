@@ -89,8 +89,11 @@ public class GameManager : MonoBehaviour
 
     // General
     private int Index_city = 0;
+    private int countHits = 0;  // Count the amount of cities hit in each level 
     public float scaleFactor;
     private bool isControllersMenu = true;
+    private bool enablePauseButton = false;
+    private bool enableEnterButton = true;
 
     private void Awake()
     {
@@ -144,7 +147,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    private void ControllersMenu(bool activate) // Change name
+    private void Menu(bool activate) // Change name
     {
         if (activate)
         {
@@ -258,43 +261,36 @@ public class GameManager : MonoBehaviour
         StopPlane(pause);
         if (isGamePaused)
         {
-            ControllersMenu(true);
-            //if (isControllersMenu)
-            //{
-            //    ControllersMenu(true);
-            //}
-            //else
-            //{
-            //    ControllersMenu(false);
-
-            //}
+            Menu(true);
         }
         else
         {
-            ControllersMenu(false);
+            Menu(false);
         }
     }
     private void isEnterPressedYet()
     {
-        if (state == GameState.Tutorial && Input.GetKeyDown(KeyCode.Return))
+        if (enableEnterButton)
         {
-            TutorialStage++;
-            if (TutorialStage == 5)
+            if (state == GameState.Tutorial && Input.GetKeyDown(KeyCode.Return))
             {
-                //instructions.enabled = false;
-                PauseGame(true);
+                TutorialStage++;
+                if (TutorialStage == 5)
+                {
+                    PauseGame(true);
+                }
             }
-        }
-        if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
-        {
-            // Called between each level
-            if (MainGameStage == 0)
+            if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
             {
-                MainGameStage++;
+                // Called between each level
+                if (MainGameStage == 0)
+                {
+                    MainGameStage++;
 
+                }
+                StopPlane(false);
+                levelScore.SetActive(false);
             }
-            StopPlane(false);
-            levelScore.SetActive(false);
         }
     }
 
@@ -318,7 +314,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Check if P key was pressed to toggle pause
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.P) && enablePauseButton)
         {
             isGamePaused = !isGamePaused; // Toggle the pause state
             PauseGame(isGamePaused);
@@ -353,12 +349,12 @@ public class GameManager : MonoBehaviour
             case 1:
                 background.enabled = false;
                 gameLogo.enabled = false;
-                ControllersMenu(true);
+                Menu(true);
                 isEnterPressedYet();
                 break;
             case 2:
                 isControllersMenu = false;  // Sets to Main Menu mode
-                ControllersMenu(false);
+                Menu(false);
                 Speedometer.enabled = true;
                 SpeedometerP.enabled = true;
                 Compass.enabled = true;
@@ -368,12 +364,14 @@ public class GameManager : MonoBehaviour
                 instructions.text = "Try dropping delivery on Tel Aviv\r\nin less then 5 km distance!";
                 StopPlane(false);
                 engineAudio.Play();
+                enablePauseButton = true;
                 TutorialStage++;
                 break;
             case 3:
                 // Here i want the code to skip othor options and wait for target hit
                 break;
             case 4:
+                enablePauseButton = false;
                 isEnterPressedYet();    // This is the end of tutorial, it waits for enter pressed to go to the menu!
                 break;
         }
@@ -385,24 +383,29 @@ public class GameManager : MonoBehaviour
         {
             case 0:
                 // Wait to start game
-                //isControllersMenu = false;
-                //ControllersMenu(true);
+                countHits = 0;
+                timer.StopTimer();
+                timer.timerText.enabled = false;
                 telAvivArrow.SetActive(false);
                 targetText.enabled = false;
+                MissedOrHit.enabled = false;
                 targetLogo.enabled = false;
                 movePlayerScript.respawn();
                 StopPlane(true);
-                if (Level == 0)
+                if (Level == 0) // Only for first level
                 {
                     instructions.enabled = true;
                     instructions.text = "Ready? press enter to begin the game!";
                 }
+                enableEnterButton = true;
+                enablePauseButton = false;
                 isEnterPressedYet();
                 break;
             case 1:
+                enableEnterButton = false;
+                enablePauseButton = true;
                 visibleTargets(true);
                 setTimerByDistance();
-
                 instructions.enabled = false;
                 //movePlayerScript.respawn();
                 hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
@@ -420,6 +423,8 @@ public class GameManager : MonoBehaviour
 
     private void FreeFly()
     {
+        enableEnterButton = false;
+        enablePauseButton = true;
         telAvivArrow.SetActive(false);
         visibleTargets(true);
     }
@@ -436,6 +441,8 @@ public class GameManager : MonoBehaviour
             else
             {
                 StopPlane(true);
+                enableEnterButton = true;
+                enablePauseButton = false;
                 instructions.text = "Good job! You Droped on the target! \r\n Press enter to enter the game manu";
                 TutorialStage++;
                 //PauseGame(true);
@@ -454,46 +461,59 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                //
-                MissedOrHit.text = "";
-                Index_city++;
-                if (Index_city < CurrentTargets.Length)
-                {
-                    StartCoroutine(TimerText());
-                    hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
-                    targetText.text = "Target: " + CurrentTargets[Index_city].name;
-                    setTimerByDistance();
-                    //MissedOrHit.text = "Good job. \r\n next target: " + cities[Index_city].name;
-                    //targetText.text = "Target: " + cities[Index_city].name;
-                }
-                else
-                {
-                    float count = Level + 1;
-                    //instructions.text = "Good job! you passed level " + count + "\n Press enter for next level";
-                    levelScore.SetActive(true);
-                    timer.StopTimer();
-                    //watch.StopStopwatch();
-                    instructions.enabled = false;
-                    targetText.enabled = false;
-                    targetLogo.enabled = false;
-                    MissedOrHit.enabled = false;
-                    StopPlane(true);
-                    if (Level < Levels.Length)
-                    {
-                        Level++;
-                    }
-                    else
-                    {
-                        instructions.text = "Congradulations! you Passed all levels";
-                    }
-                    Index_city = 0;
-                    // Add if statment to go to next level or not
-                    getTargets(Levels[Level]);
-                    MainGameStage = 0;
-                    //isEnterPressedYet();
-                }
+                NextTarget(true);   // Toggle target hit
                 return;
             }
+        }
+    }
+
+    public void TimerFinished()
+    {
+        NextTarget(false);  // Toggle timer up
+    }
+
+    private void NextTarget(bool targetHit)   // If false - timer was up or plane crash, if true - target was hit
+    {
+        if (targetHit) { countHits++; }
+        MissedOrHit.text = "";
+        Index_city++;
+        if (Index_city < CurrentTargets.Length)
+        {
+            if (targetHit)
+            {
+                StartCoroutine(TimerText("Good job!"));
+            }
+            else
+            {
+                StartCoroutine(TimerText("Timer up!")); // In case of plane crash this text will be overwritten
+            }
+            hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
+            targetText.text = "Target: " + CurrentTargets[Index_city].name;
+            setTimerByDistance();
+        }
+        else
+        {
+            float count = Level + 1;    // Just for printing
+            levelScore.SetActive(true); // Score screen
+            timer.StopTimer();
+            //watch.StopStopwatch();
+            instructions.enabled = false;
+            targetText.enabled = false;
+            targetLogo.enabled = false;
+            MissedOrHit.enabled = false;
+            StopPlane(true);
+            if (Level < Levels.Length)
+            {
+                Level++;
+            }
+            else
+            {
+                instructions.text = "Congradulations! you Passed all levels";
+            }
+            Index_city = 0;
+            // Add if statment to go to next level or not
+            getTargets(Levels[Level]);
+            MainGameStage = 0;
         }
     }
 
@@ -514,8 +534,9 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Plane crash!");
         planeCrash = true;
-        StartCoroutine(TimerText());
         movePlayerScript.respawn();
+        if (state == GameState.MainGame) { NextTarget(false); }
+        else { StartCoroutine(TimerText("")); }
     }
 
     private void visibleTargets(bool visible)
@@ -544,6 +565,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // This function loads current target with a level
     private void getTargets(GameObject level)
     {
         int childCount = level.transform.childCount;
@@ -573,18 +595,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-    IEnumerator TimerText()
+    IEnumerator TimerText(string text)
     {
         if (planeCrash)
         {
-            timerText.text = "Plane Crash!\nTry again";
+            timerText.text = "Plane Crash!";
             instructions.enabled = false;
             timerText.enabled = true;
         }
         else
         {
-            timerText.text = "Good Job!";
+            timerText.text = text;
             timerText.enabled = true;
         }
         yield return new WaitForSeconds(2); // Wait for 2 seconds
@@ -597,6 +618,7 @@ public class GameManager : MonoBehaviour
     }
     public void FreeFlyButton()
     {
+
         state = GameState.FreeFly;
         movePlayerScript.respawn();
         PauseGame(false);
@@ -604,6 +626,11 @@ public class GameManager : MonoBehaviour
     }
     public void ArcadeButton()
     {
+        movePlayerScript.respawn(); // Reset position
+        MainGameStage = 0;  // Reset the game stage
+        Level = 0;  // Reset levels
+        Index_city = 0;
+        getTargets(Levels[0]);  // Set the first stage to the current targets
         state = GameState.MainGame;
         //movePlayerScript.respawn();
         PauseGame(false);

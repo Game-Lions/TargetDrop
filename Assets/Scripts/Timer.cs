@@ -8,6 +8,7 @@ public class Timer : MonoBehaviour
     private float duration; // Set the timer duration in seconds in the Inspector
     private float remainingTime;
     private bool isRunning = false;
+    private
 
     //void Start()
     //{
@@ -64,6 +65,7 @@ public class Timer : MonoBehaviour
     private void OnTimerEnd()
     {
         Debug.Log("Timer finished!");
+        GameManager.instance.TimerFinished();
         // Add additional logic here (e.g., show a message or trigger an event).
     }
 }
