@@ -287,7 +287,6 @@ public class MovePlayer : MonoBehaviour
 
     public void respawn()
     {
-        //Rigidbody rb = player.transform.GetComponent<Rigidbody>();
         // Reset velocity and angular velocity
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;

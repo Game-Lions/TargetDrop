@@ -18,6 +18,8 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.Audio;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
+//using UnityEngine.UIElements;
 
 
 
@@ -38,6 +40,12 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Spawner spawnerScript;
 
     // Canvas game text
+    public GameObject menuButtons;
+    public GameObject backButton;
+    public GameObject levelScore;
+    public Button freeFlyButton;
+    public Button arcadeButton;
+    public Button controllersButton;
     public TextMeshProUGUI instructions;
     public TextMeshProUGUI controllers;
     public TextMeshProUGUI next;
@@ -82,6 +90,7 @@ public class GameManager : MonoBehaviour
     // General
     private int Index_city = 0;
     public float scaleFactor;
+    private bool isControllersMenu = true;
 
     private void Awake()
     {
@@ -109,11 +118,16 @@ public class GameManager : MonoBehaviour
         InstructionsBackground.enabled = false;
         instructions.enabled = false;
         controllers.enabled = false;
+        backButton.SetActive(false);
         muteAndPlay.enabled = false;
+        menuButtons.SetActive(false);
+        levelScore.SetActive(false);
         UpdateGameState(GameState.Tutorial);
 
         getTargets(Levels[0]);
         visibleTargets(false);
+
+        //freeFlyButton.onClick.
     }
     public void UpdateGameState(GameState newState)
     {
@@ -130,7 +144,7 @@ public class GameManager : MonoBehaviour
                 break;
         }
     }
-    private void ControllersMenu(bool activate)
+    private void ControllersMenu(bool activate) // Change name
     {
         if (activate)
         {
@@ -146,23 +160,39 @@ public class GameManager : MonoBehaviour
             instructions.enabled = false;
             InstructionsBackground.enabled = true;
             muteAndPlay.enabled = true;
-            //instructions.enabled = true;
-            //instructions.fontSize = 19;
-            //instructions.alignment = TextAlignmentOptions.Top;
-            controllers.enabled = true;
-            //instructions.text = "Controllers:\r\nDown arrow - fly up\r\nUp  arrow - fly down\r\n" +
-            //    "Right arrow - turn right\r\nLeft arrow - turn left\r\nShift+Right arrow - spin right\r\nShift+Left arrow - spin Left\r\nSpace bar - drop package\r\n" +
-            //    "S - boost speed \r\n P - pause game";
-            next.enabled = true;
-
             timer.StopTimer();
             timer.timerText.enabled = false;
-            //watch.StopStopwatch();
-            //watch.timerText.enabled = false;
+            if(state == GameState.Tutorial && TutorialStage == 5)
+            {
+                next.enabled = false;
+            }
+            else
+            {
+                next.enabled = true;
+            }
+            if (isControllersMenu)
+            {
+                controllers.enabled = true;
+                if (state == GameState.Tutorial && TutorialStage < 2)
+                {
+                    backButton.SetActive(false);
+                }
+                else
+                {
+                    backButton.SetActive(true);
+                }
+                menuButtons.SetActive(false);
+            }
+            else
+            {
+                controllers.enabled = false;
+                backButton.SetActive(false);
+                menuButtons.SetActive(true);
+            }
         }
         else
         {
-            if (state != GameState.Tutorial)
+            if (state == GameState.MainGame)
             {
                 targetLogo.enabled = true;
                 targetText.enabled = true;
@@ -177,6 +207,14 @@ public class GameManager : MonoBehaviour
             {
                 instructions.enabled = true;
             }
+            else if (state == GameState.FreeFly) {
+                targetLogo.enabled = false;
+                targetText.enabled = false;
+                MissedOrHit.enabled = false;
+
+                timer.StopTimer();
+                timer.timerText.enabled = false;
+            }
             miniMap.enabled = true;
             miniMapBackground.enabled = true;
             miniMapPlayer.enabled = true;
@@ -186,9 +224,15 @@ public class GameManager : MonoBehaviour
             next.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
+            backButton.SetActive(false);
             muteAndPlay.enabled = false;
+            menuButtons.SetActive(false);
+            isControllersMenu = false;
+            //menuButtons.SetActive(false);
         }
+
     }
+
     private void StopPlane(bool shouldStop)
     {
         isGamePaused = shouldStop;
@@ -202,11 +246,11 @@ public class GameManager : MonoBehaviour
         }
         movePlayerScript.ActiveControllers = !isGamePaused;
         spawnerScript.enabled = !isGamePaused;
-
         // Stop all movement and rotation
         Rigidbody rb = player.GetComponent<Rigidbody>();
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
+
     }
     private void PauseGame(bool pause)
     {
@@ -214,6 +258,15 @@ public class GameManager : MonoBehaviour
         if (isGamePaused)
         {
             ControllersMenu(true);
+            //if (isControllersMenu)
+            //{
+            //    ControllersMenu(true);
+            //}
+            //else
+            //{
+            //    ControllersMenu(false);
+
+            //}
         }
         else
         {
@@ -225,6 +278,11 @@ public class GameManager : MonoBehaviour
         if (state == GameState.Tutorial && Input.GetKeyDown(KeyCode.Return))
         {
             TutorialStage++;
+            if (TutorialStage == 5)
+            {
+                //instructions.enabled = false;
+                PauseGame(true);
+            }
         }
         if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
         {
@@ -232,8 +290,10 @@ public class GameManager : MonoBehaviour
             if (MainGameStage == 0)
             {
                 MainGameStage++;
+                
             }
             StopPlane(false);
+            levelScore.SetActive(false);
         }
     }
 
@@ -249,6 +309,11 @@ public class GameManager : MonoBehaviour
         if (state == GameState.MainGame)
         {
             MainGame(Index_city);
+        }
+
+        if (state == GameState.FreeFly)
+        {
+            FreeFly();
         }
 
         // Check if P key was pressed to toggle pause
@@ -270,7 +335,6 @@ public class GameManager : MonoBehaviour
                 backgroundMusic.Play();
             }
         }
-
     }
 
     private void Tutorial()
@@ -292,6 +356,7 @@ public class GameManager : MonoBehaviour
                 isEnterPressedYet();
                 break;
             case 2:
+                isControllersMenu = false;  // Sets to Main Menu mode
                 ControllersMenu(false);
                 Speedometer.enabled = true;
                 SpeedometerP.enabled = true;
@@ -307,6 +372,9 @@ public class GameManager : MonoBehaviour
             case 3:
                 // Here i want the code to skip othor options and wait for target hit
                 break;
+            case 4:
+                isEnterPressedYet();    // This is the end of tutorial, it waits for enter pressed to go to the menu!
+                break;
         }
     }
 
@@ -316,6 +384,18 @@ public class GameManager : MonoBehaviour
         {
             case 0:
                 // Wait to start game
+                //isControllersMenu = false;
+                //ControllersMenu(true);
+                telAvivArrow.SetActive(false);
+                targetText.enabled = false;
+                targetLogo.enabled = false;
+                movePlayerScript.respawn();
+                StopPlane(true);
+                if(Level == 0)
+                {
+                    instructions.enabled = true;
+                    instructions.text = "Ready? press enter to begin the game!";
+                }
                 isEnterPressedYet();
                 break;
             case 1:
@@ -323,7 +403,7 @@ public class GameManager : MonoBehaviour
                 setTimerByDistance();
 
                 instructions.enabled = false;
-                movePlayerScript.respawn();
+                //movePlayerScript.respawn();
                 hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
                 targetText.text = "Target: " + CurrentTargets[Index_city].name;
                 targetText.enabled = true;
@@ -337,6 +417,12 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void FreeFly()
+    {
+        telAvivArrow.SetActive(false);
+        visibleTargets(true);
+    }
+
     public void TargetHit(double distance)
     {
         if (state == GameState.Tutorial)
@@ -348,9 +434,11 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                StopPlane(true);
-                instructions.text = "Good job! You Droped on the target! \r\n Press enter to begin the game!";
-                UpdateGameState(GameState.MainGame);
+                StopPlane(true);    
+                instructions.text = "Good job! You Droped on the target! \r\n Press enter to enter the game manu";
+                TutorialStage++;
+                //PauseGame(true);
+                //UpdateGameState(GameState.FreeFly); //  in general to menu
                 telAvivArrow.SetActive(false);
                 return;
             }
@@ -365,6 +453,7 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                //
                 MissedOrHit.text = "";
                 Index_city++;
                 if (Index_city < CurrentTargets.Length)
@@ -379,10 +468,11 @@ public class GameManager : MonoBehaviour
                 else
                 {
                     float count = Level + 1;
-                    instructions.text = "Good job! you passed level " + count + "\n Press enter for next level";
+                    //instructions.text = "Good job! you passed level " + count + "\n Press enter for next level";
+                    levelScore.SetActive(true);
                     timer.StopTimer();
                     //watch.StopStopwatch();
-                    instructions.enabled = true;
+                    instructions.enabled = false;
                     targetText.enabled = false;
                     targetLogo.enabled = false;
                     MissedOrHit.enabled = false;
@@ -396,6 +486,7 @@ public class GameManager : MonoBehaviour
                         instructions.text = "Congradulations! you Passed all levels";
                     }
                     Index_city = 0;
+                    // Add if statment to go to next level or not
                     getTargets(Levels[Level]);
                     MainGameStage = 0;
                     //isEnterPressedYet();
@@ -503,6 +594,32 @@ public class GameManager : MonoBehaviour
         timerText.enabled = false;
         planeCrash = false;
     }
+    public void FreeFlyButton()
+    {
+        state = GameState.FreeFly;
+        movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("FreeFly pressed!");
+    }
+    public void ArcadeButton()
+    {
+        state = GameState.MainGame;
+        //movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("Arcade pressed!");
+    }
+    public void ControllersButton()
+    {
+        isControllersMenu = true;
+        PauseGame(true);
+        Debug.Log("Controllers pressed!");
+    }
+    public void BackButton()
+    {
+        isControllersMenu = false;
+        PauseGame(true);
+        Debug.Log("Back pressed!");
+    }
 }
 
 public enum GameState
@@ -510,6 +627,7 @@ public enum GameState
     Menu,
     Tutorial,
     MainGame,
+    FreeFly,
     //PlaneCrash,
     pause,
     none
