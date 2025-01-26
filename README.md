@@ -12,7 +12,7 @@ Michael Binyamin and Adi Yohanan
 
 # Thanks(תודות)
 ### Help from students:  
-graphic design - Avia Shapira. student in ariel for Industrial Engineering and Management, she is a friend with experiance with graphic designing  
+graphic design - Avia Shapira. student in ariel for Industrial Engineering and Management, she is a friend with experiance in graphic designing  
 ### Assets:     
 Israel detailed satalite map - (no provided name) https://www.dropbox.com/scl/fo/2u65nf95l5vcwqlga04ul/AM2jXamSx1dYILONwvW8cIU?rlkey=abrzt6xsbwoktda514mfe5c61&e=1&dl=0  
 c17 model - (AnirudhRao) https://sketchfab.com/3d-models/c17-globemaster-iii-597e0d7f9e3446719a2f2de3dd3fa67d  
