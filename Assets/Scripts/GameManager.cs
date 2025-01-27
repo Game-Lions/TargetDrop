@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour
     public GameObject difficultyButtons;
     public GameObject backButton;
     public GameObject levelScore;
+    public GameObject controllersPic;
     public Button freeFlyButton;
     public Button arcadeButton;
     public Button controllersButton;
@@ -53,6 +54,7 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI targetText;
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI muteAndPlay;
+    public RawImage instructionsTextBackground;
     public RawImage targetLogo;
     public RawImage gameLogo;
     public RawImage background;
@@ -121,6 +123,7 @@ public class GameManager : MonoBehaviour
         //hitTargetScript = map.GetComponent<HitTarget>();
         //PauseGame(true);
         backgroundMusic.Play();
+        gameLogo.enabled = true;
         miniMap.enabled = false;
         miniMapBackground.enabled = false;
         miniMapPlayer.enabled = false;
@@ -132,7 +135,9 @@ public class GameManager : MonoBehaviour
         MissedOrHit.enabled = false;
         InstructionsBackground.enabled = false;
         instructions.enabled = false;
+        instructionsTextBackground.enabled = false;
         controllers.enabled = false;
+        controllersPic.SetActive(false);
         backButton.SetActive(false);
         muteAndPlay.enabled = false;
         menuButtons.SetActive(false);
@@ -179,6 +184,7 @@ public class GameManager : MonoBehaviour
             targetText.enabled = false;
             MissedOrHit.enabled = false;
             instructions.enabled = false;
+            instructionsTextBackground.enabled = false;
             InstructionsBackground.enabled = true;
             muteAndPlay.enabled = true;
             timer.StopTimer();
@@ -194,6 +200,7 @@ public class GameManager : MonoBehaviour
             if (isControllersMenu)
             {
                 controllers.enabled = true;
+                controllersPic.SetActive(true);
                 if (state == GameState.Tutorial && TutorialStage < 2)
                 {
                     backButton.SetActive(false);
@@ -213,6 +220,7 @@ public class GameManager : MonoBehaviour
             else
             {
                 controllers.enabled = false;
+                controllersPic.SetActive(false);
                 difficultyButtons.SetActive(false);
                 backButton.SetActive(false);
                 menuButtons.SetActive(true);
@@ -234,6 +242,7 @@ public class GameManager : MonoBehaviour
             else if (state == GameState.Tutorial)
             {
                 instructions.enabled = true;
+                instructionsTextBackground.enabled = true;
             }
             else if (state == GameState.FreeFly)
             {
@@ -253,6 +262,7 @@ public class GameManager : MonoBehaviour
             next.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
+            controllersPic.SetActive(false);
             backButton.SetActive(false);
             muteAndPlay.enabled = false;
             menuButtons.SetActive(false);
@@ -376,7 +386,7 @@ public class GameManager : MonoBehaviour
                 StopPlane(true);
                 hitTargetScript.SetTarget("TelAviv");
                 telAvivText.SetActive(true);
-                instructions.fontSize = 30;
+                instructions.fontSize = 18;
                 //instructions.text = "Welcome to TargetDrop!";
                 isEnterPressedYet();
                 break;
@@ -393,7 +403,7 @@ public class GameManager : MonoBehaviour
                 SpeedometerP.enabled = true;
                 Compass.enabled = true;
                 next.text = "press P to \r\ncontinue";
-                instructions.fontSize = 20;
+                instructions.fontSize = 18;
                 instructions.alignment = TextAlignmentOptions.Top;
                 instructions.text = "Try dropping delivery on Tel Aviv\r\nin less then 5 km distance!";
                 StopPlane(false);
@@ -495,7 +505,7 @@ public class GameManager : MonoBehaviour
                 StopPlane(true);
                 enableEnterButton = true;
                 enablePauseButton = false;
-                instructions.text = "Good job! You Droped on the target! \r\n Press enter to enter the game manu";
+                instructions.text = "Good job! You Droped on the target! \r\nPress enter to enter the game manu";
                 TutorialStage++;
                 //PauseGame(true);
                 //UpdateGameState(GameState.FreeFly); //  in general to menu
@@ -600,6 +610,7 @@ public class GameManager : MonoBehaviour
             timer.StopTimer();
             //watch.StopStopwatch();
             instructions.enabled = false;
+            instructionsTextBackground.enabled = false;
             targetText.enabled = false;
             targetLogo.enabled = false;
             MissedOrHit.enabled = false;
@@ -700,11 +711,13 @@ public class GameManager : MonoBehaviour
     {
         timerText.text = text;
         instructions.enabled = false;
+        instructionsTextBackground.enabled = false;
         timerText.enabled = true;
         yield return new WaitForSeconds(2); // Wait for 2 seconds
         if (state == GameState.Tutorial)
         {
             instructions.enabled = true;
+            instructionsTextBackground.enabled = true;
         }
         timerText.enabled = false;
     }

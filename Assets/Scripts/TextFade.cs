@@ -8,10 +8,21 @@ public class FadeText : MonoBehaviour
     public float fadeDuration = 1f; // Duration for each fade in/out
     public float delayBetweenFades = 0.5f; // Delay between fades
 
-    private void Start()
+    private Coroutine fadeCoroutine; // To keep track of the coroutine
+
+    private void OnEnable()
     {
         if (!text) text = GetComponent<TextMeshProUGUI>();
-        StartCoroutine(FadeInAndOut());
+        fadeCoroutine = StartCoroutine(FadeInAndOut());
+    }
+
+    private void OnDisable()
+    {
+        // Stop the coroutine when the GameObject is disabled
+        if (fadeCoroutine != null)
+        {
+            StopCoroutine(fadeCoroutine);
+        }
     }
 
     private IEnumerator FadeInAndOut()
