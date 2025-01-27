@@ -53,6 +53,14 @@ public class Timer : MonoBehaviour
         int seconds = Mathf.FloorToInt(remainingTime % 60);
         int milliseconds = Mathf.FloorToInt((remainingTime * 1000) % 100);
         timerText.text = $"{minutes:D2}:{seconds:D2}:{milliseconds:D2}";
+        if (minutes < 1 && seconds < 7)
+        {
+            timerText.color = Color.red;
+        }
+        else
+        {
+            timerText.color = new Color32(230, 169, 98, 255); // E6A962 in RGBA
+        }
     }
 
     public void setTimer(float time)

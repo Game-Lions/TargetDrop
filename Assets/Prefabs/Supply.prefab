@@ -235,8 +235,8 @@ Rigidbody:
   m_GameObject: {fileID: 5186483040901603162}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 1
-  m_AngularDrag: 1
+  m_Drag: 0.01
+  m_AngularDrag: 0.01
   m_CenterOfMass: {x: 102.74, y: 38.99, z: 0}
   m_InertiaTensor: {x: 139.6, y: 14.26, z: 1}
   m_InertiaRotation: {x: 0.1082889, y: 0.085688725, z: -0.009369349, w: 0.9903753}

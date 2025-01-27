@@ -32,7 +32,6 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject player;
     [SerializeField] private GameObject telAvivArrow;
     [SerializeField] private GameObject telAvivText;
-    private bool planeCrash = false;
 
     // Game scripts
     [SerializeField] private HitTarget hitTargetScript;
@@ -41,6 +40,7 @@ public class GameManager : MonoBehaviour
 
     // Canvas game text
     public GameObject menuButtons;
+    public GameObject difficultyButtons;
     public GameObject backButton;
     public GameObject levelScore;
     public Button freeFlyButton;
@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour
     // Manager Game state
     private GameState state = GameState.Tutorial;
     private int TutorialStage = 0;
-    private int MainGameStage = 0;
+    private int ArcadeStage = 0;
     public bool isGamePaused = true;
 
     // MiniMap
@@ -90,10 +90,22 @@ public class GameManager : MonoBehaviour
     // General
     private int Index_city = 0;
     private int countHits = 0;  // Count the amount of cities hit in each level 
-    public float scaleFactor;
     private bool isControllersMenu = true;
+    private bool isDifficultyMenu = false;
     private bool enablePauseButton = false;
     private bool enableEnterButton = true;
+    private bool LevelScoreRules = true;
+    private float levelAmountOfTargets;
+    private float one_star;
+    private float two_stars;
+    private float three_stars;
+    RawImage star_1_image;
+    RawImage star_2_image;
+    RawImage star_3_image;
+    TextMeshProUGUI textComponentForLevelScore;
+    //public float scaleFactor;
+    private int difficulty_level;
+    public float[] difficulty;
 
     private void Awake()
     {
@@ -124,9 +136,17 @@ public class GameManager : MonoBehaviour
         backButton.SetActive(false);
         muteAndPlay.enabled = false;
         menuButtons.SetActive(false);
+        difficultyButtons.SetActive(false);
         levelScore.SetActive(false);
         UpdateGameState(GameState.Tutorial);
-
+        //levelAmountOfTargets = 0;
+        //one_star = levelAmountOfTargets;
+        //two_stars = levelAmountOfTargets;
+        //three_stars = levelAmountOfTargets;
+        star_1_image = levelScore.transform.GetChild(1).GetComponent<RawImage>();
+        star_2_image = levelScore.transform.GetChild(2).GetComponent<RawImage>();
+        star_3_image = levelScore.transform.GetChild(3).GetComponent<RawImage>();
+        textComponentForLevelScore = levelScore.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         getTargets(Levels[0]);
         visibleTargets(false);
 
@@ -141,9 +161,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GameState.Tutorial:
                 break;
-            case GameState.MainGame:
-                break;
-            case GameState.pause:
+            case GameState.Arcade:
                 break;
         }
     }
@@ -186,16 +204,23 @@ public class GameManager : MonoBehaviour
                 }
                 menuButtons.SetActive(false);
             }
+            else if (isDifficultyMenu)
+            {
+                difficultyButtons.SetActive(true);
+                backButton.SetActive(true);
+                menuButtons.SetActive(false);
+            }
             else
             {
                 controllers.enabled = false;
+                difficultyButtons.SetActive(false);
                 backButton.SetActive(false);
                 menuButtons.SetActive(true);
             }
         }
         else
         {
-            if (state == GameState.MainGame)
+            if (state == GameState.Arcade)
             {
                 targetLogo.enabled = true;
                 targetText.enabled = true;
@@ -231,7 +256,9 @@ public class GameManager : MonoBehaviour
             backButton.SetActive(false);
             muteAndPlay.enabled = false;
             menuButtons.SetActive(false);
+            difficultyButtons.SetActive(false);
             isControllersMenu = false;
+            isDifficultyMenu = false;
             //menuButtons.SetActive(false);
         }
 
@@ -280,12 +307,19 @@ public class GameManager : MonoBehaviour
                     PauseGame(true);
                 }
             }
-            if (state == GameState.MainGame && Input.GetKeyDown(KeyCode.Return))
+            if (state == GameState.Arcade && Input.GetKeyDown(KeyCode.Return))
             {
                 // Called between each level
-                if (MainGameStage == 0)
+                if (ArcadeStage == 0)
                 {
-                    MainGameStage++;
+                    if (LevelScoreRules)
+                    {
+                        ArcadeStage++;
+                    }
+                    else
+                    {
+                        LevelScoreRules = true;
+                    }
 
                 }
                 StopPlane(false);
@@ -303,7 +337,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Main game
-        if (state == GameState.MainGame)
+        if (state == GameState.Arcade)
         {
             MainGame(Index_city);
         }
@@ -379,7 +413,7 @@ public class GameManager : MonoBehaviour
 
     private void MainGame(int Index_city)
     {
-        switch (MainGameStage)
+        switch (ArcadeStage)
         {
             case 0:
                 // Wait to start game
@@ -392,10 +426,28 @@ public class GameManager : MonoBehaviour
                 targetLogo.enabled = false;
                 movePlayerScript.respawn();
                 StopPlane(true);
-                if (Level == 0) // Only for first level
+                levelAmountOfTargets = CurrentTargets.Length;
+                //one_star = levelAmountOfTargets / 3f;
+                //two_stars = levelAmountOfTargets / 1.5f;
+                one_star = Mathf.Ceil(levelAmountOfTargets / 3f);
+                two_stars = Mathf.Ceil(levelAmountOfTargets / 1.5f);
+                three_stars = levelAmountOfTargets;
+                if (LevelScoreRules) // Only for first level
                 {
-                    instructions.enabled = true;
-                    instructions.text = "Ready? press enter to begin the game!";
+                    float count = Level + 1;
+                    star_1_image.enabled = false;
+                    star_2_image.enabled = false;
+                    star_3_image.enabled = false;
+                    textComponentForLevelScore.text = "Level " + count +
+                        "\n1 star - " + one_star + " targets" +
+                        "\n2 stars - " + two_stars + " targets" +
+                        "\n3 stars - " + three_stars + " targets" +
+                        "\n\n You need at least 1 star to pass to the next level.";
+                    textComponentForLevelScore.fontSize = 30;
+                    //textComponentForLevelScore.alignment = TextAlignmentOptions.Left;
+                    levelScore.SetActive(true);
+                    //instructions.enabled = true;
+                    //instructions.text = "Ready? press enter to begin the game!";
                 }
                 enableEnterButton = true;
                 enablePauseButton = false;
@@ -406,14 +458,14 @@ public class GameManager : MonoBehaviour
                 enablePauseButton = true;
                 visibleTargets(true);
                 setTimerByDistance();
-                instructions.enabled = false;
-                //movePlayerScript.respawn();
+                //instructions.enabled = false;
+                levelScore.SetActive(false);
                 hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
                 targetText.text = "Target: " + CurrentTargets[Index_city].name;
                 targetText.enabled = true;
                 targetLogo.enabled = true;
                 MissedOrHit.enabled = true;
-                MainGameStage++;
+                ArcadeStage++;
                 break;
             case 2:
                 // GamePlay
@@ -452,16 +504,17 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        if (state == GameState.MainGame)
+        if (state == GameState.Arcade)
         {
             if (distance > 5)
             {
                 MissedOrHit.text = "Missed by : " + distance.ToString("F2") + " km\r\n";
+                StartCoroutine(TimerText("Missed target!"));
                 return;
             }
             else
             {
-                NextTarget(true);   // Toggle target hit
+                NextTarget(true, "Good job!");   // Toggle target hit
                 return;
             }
         }
@@ -469,31 +522,80 @@ public class GameManager : MonoBehaviour
 
     public void TimerFinished()
     {
-        NextTarget(false);  // Toggle timer up
+        NextTarget(false, "Time up!");  // Toggle timer up
     }
 
-    private void NextTarget(bool targetHit)   // If false - timer was up or plane crash, if true - target was hit
+    private void NextTarget(bool targetHit, string reason)   // If false - timer was up or plane crash, if true - target was hit
     {
         if (targetHit) { countHits++; }
         MissedOrHit.text = "";
         Index_city++;
         if (Index_city < CurrentTargets.Length)
         {
-            if (targetHit)
-            {
-                StartCoroutine(TimerText("Good job!"));
-            }
-            else
-            {
-                StartCoroutine(TimerText("Timer up!")); // In case of plane crash this text will be overwritten
-            }
+            StartCoroutine(TimerText(reason));
             hitTargetScript.SetTarget(CurrentTargets[Index_city].name);
             targetText.text = "Target: " + CurrentTargets[Index_city].name;
             setTimerByDistance();
         }
         else
         {
+            bool PassedLevel = false;
             float count = Level + 1;    // Just for printing
+            //textComponentForLevelScore.alignment = TextAlignmentOptions.Center;
+            textComponentForLevelScore.fontSize = 40;
+            //levelAmountOfTargets = CurrentTargets.Length;
+            star_1_image.enabled = true;
+            star_2_image.enabled = true;
+            star_3_image.enabled = true;
+
+            if (countHits < one_star)
+            {
+                LevelScoreRules = false;
+                PassedLevel = false;
+                textComponentForLevelScore.text = "You need at least 1 star for next level,\n Try again!";
+                //star_1_image.enabled = true;f
+                //star_2_image.enabled = true;f
+                //star_3_image.enabled = true;false
+                star_1_image.color = Color.black;
+                star_2_image.color = Color.black;
+                star_3_image.color = Color.black;
+            }
+            else if (countHits >= one_star && countHits < two_stars)
+            {
+                LevelScoreRules = false;
+                PassedLevel = true;
+                textComponentForLevelScore.text = "Good Job! \n you passed level " + count;
+                //star_1_image.enabled = true;
+                //star_2_image.enabled = false;
+                //star_3_image.enabled = false;
+                star_1_image.color = Color.white;
+                star_2_image.color = Color.black;
+                star_3_image.color = Color.black;
+            }
+            else if (countHits >= two_stars && countHits < three_stars)
+            {
+                LevelScoreRules = false;
+                PassedLevel = true;
+                textComponentForLevelScore.text = "Good Job! \n you passed level " + count;
+                //star_1_image.enabled = true;
+                //star_2_image.enabled = true;
+                //star_3_image.enabled = false;
+                star_1_image.color = Color.white;
+                star_2_image.color = Color.white;
+                star_3_image.color = Color.black;
+            }
+            else
+            {
+                LevelScoreRules = false;
+                PassedLevel = true;
+                textComponentForLevelScore.text = "Good Job! \n you passed level " + count + " With all stars!";
+                //star_1_image.enabled = true;
+                //star_2_image.enabled = true;
+                //star_3_image.enabled = true;
+                star_1_image.color = Color.white;
+                star_2_image.color = Color.white;
+                star_3_image.color = Color.white;
+            }
             levelScore.SetActive(true); // Score screen
             timer.StopTimer();
             //watch.StopStopwatch();
@@ -502,7 +604,7 @@ public class GameManager : MonoBehaviour
             targetLogo.enabled = false;
             MissedOrHit.enabled = false;
             StopPlane(true);
-            if (Level < Levels.Length)
+            if (Level < Levels.Length && PassedLevel)
             {
                 Level++;
             }
@@ -513,7 +615,7 @@ public class GameManager : MonoBehaviour
             Index_city = 0;
             // Add if statment to go to next level or not
             getTargets(Levels[Level]);
-            MainGameStage = 0;
+            ArcadeStage = 0;
         }
     }
 
@@ -523,7 +625,7 @@ public class GameManager : MonoBehaviour
         float distanceFromTarget = Vector3.Distance(player.transform.position, CurrentTargets[Index_city].transform.position);
 
         // Apply a non-linear adjustment to the distance
-        float adjustedTime = Mathf.Log(1 + distanceFromTarget) * scaleFactor; // Udjust scaleFactor instead
+        float adjustedTime = Mathf.Log(1 + distanceFromTarget) * difficulty[difficulty_level]; // Udjust scaleFactor instead
 
         timer.setTimer(adjustedTime); // Adjusted time based on the function
         timer.StartTimer();
@@ -533,10 +635,9 @@ public class GameManager : MonoBehaviour
     public void PlaneCrash()
     {
         Debug.Log("Plane crash!");
-        planeCrash = true;
         movePlayerScript.respawn();
-        if (state == GameState.MainGame) { NextTarget(false); }
-        else { StartCoroutine(TimerText("")); }
+        if (state == GameState.Arcade) { NextTarget(false, "Plane crash!"); }
+        else { StartCoroutine(TimerText("Plane crash!")); }
     }
 
     private void visibleTargets(bool visible)
@@ -597,24 +698,15 @@ public class GameManager : MonoBehaviour
 
     IEnumerator TimerText(string text)
     {
-        if (planeCrash)
-        {
-            timerText.text = "Plane Crash!";
-            instructions.enabled = false;
-            timerText.enabled = true;
-        }
-        else
-        {
-            timerText.text = text;
-            timerText.enabled = true;
-        }
+        timerText.text = text;
+        instructions.enabled = false;
+        timerText.enabled = true;
         yield return new WaitForSeconds(2); // Wait for 2 seconds
         if (state == GameState.Tutorial)
         {
             instructions.enabled = true;
         }
         timerText.enabled = false;
-        planeCrash = false;
     }
     public void FreeFlyButton()
     {
@@ -623,18 +715,6 @@ public class GameManager : MonoBehaviour
         movePlayerScript.respawn();
         PauseGame(false);
         Debug.Log("FreeFly pressed!");
-    }
-    public void ArcadeButton()
-    {
-        movePlayerScript.respawn(); // Reset position
-        MainGameStage = 0;  // Reset the game stage
-        Level = 0;  // Reset levels
-        Index_city = 0;
-        getTargets(Levels[0]);  // Set the first stage to the current targets
-        state = GameState.MainGame;
-        //movePlayerScript.respawn();
-        PauseGame(false);
-        Debug.Log("Arcade pressed!");
     }
     public void ControllersButton()
     {
@@ -645,18 +725,79 @@ public class GameManager : MonoBehaviour
     public void BackButton()
     {
         isControllersMenu = false;
+        isDifficultyMenu = false;
         PauseGame(true);
         Debug.Log("Back pressed!");
     }
+    public void ArcadeButton()
+    {
+        isDifficultyMenu = true;
+        PauseGame(true);
+        Debug.Log("Arcade pressed!");
+    }
+    public void EasyButton()
+    {
+        difficulty_level = 0;
+        LevelScoreRules = true;
+        movePlayerScript.respawn(); // Reset position
+        ArcadeStage = 0;  // Reset the game stage
+        Level = 0;  // Reset levels
+        Index_city = 0;
+        getTargets(Levels[0]);  // Set the first stage to the current targets
+        state = GameState.Arcade;
+        //movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("Easy pressed!");
+    }
+    public void MediumButton()
+    {
+        difficulty_level = 1;
+        LevelScoreRules = true;
+        movePlayerScript.respawn(); // Reset position
+        ArcadeStage = 0;  // Reset the game stage
+        Level = 0;  // Reset levels
+        Index_city = 0;
+        getTargets(Levels[0]);  // Set the first stage to the current targets
+        state = GameState.Arcade;
+        //movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("Medium pressed!");
+    }
+    public void HardButton()
+    {
+        difficulty_level = 2;
+        LevelScoreRules = true;
+        movePlayerScript.respawn(); // Reset position
+        ArcadeStage = 0;  // Reset the game stage
+        Level = 0;  // Reset levels
+        Index_city = 0;
+        getTargets(Levels[0]);  // Set the first stage to the current targets
+        state = GameState.Arcade;
+        //movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("Hard pressed!");
+    }
+    public void ExtremeButton()
+    {
+        difficulty_level = 3;
+        LevelScoreRules = true;
+        movePlayerScript.respawn(); // Reset position
+        ArcadeStage = 0;  // Reset the game stage
+        Level = 0;  // Reset levels
+        Index_city = 0;
+        getTargets(Levels[0]);  // Set the first stage to the current targets
+        state = GameState.Arcade;
+        //movePlayerScript.respawn();
+        PauseGame(false);
+        Debug.Log("Extreme pressed!");
+    }
+
 }
 
 public enum GameState
 {
     Menu,
     Tutorial,
-    MainGame,
-    FreeFly,
-    //PlaneCrash,
-    pause,
-    none
+    Arcade,
+    FreeFly
 }

@@ -86,50 +86,19 @@ public class MovePlayer : MonoBehaviour
             // Check if shift is held down
             shiftHeld = Keyboard.current.shiftKey.isPressed;
 
-            // Check if S is held down
-            //sHeld = Keyboard.current.sKey.isPressed;
-
             Vector2 movement = move.ReadValue<Vector2>();
             Vector2 Speedandspin = speedAndSpin.ReadValue<Vector2>();
 
             // Move player forward
-            //if (Speedandspin.y != 0)
-            //{
-            //if (currentBoost < maxBoost)
-            //{
-            //    boostAnimate = BoostSpeed * Time.deltaTime;
-            //    //plane.transform.position = new Vector3(plane.transform.position.x, plane.transform.position.y, plane.transform.position.z * boostAnimate);
-            //    plane.transform.Translate(Vector3.forward * boostAnimate);
-            //    currentBoost += boostAnimate;
-            //}
-            //float pointerPosition = (-Speedometer.rectTransform.sizeDelta.y / 2f) - 3f + ((speed / (maxSpeed+0.8f)) * Speedometer.rectTransform.sizeDelta.y);
-            //float divide = Speedometer.rectTransform.sizeDelta.y * accelerationSpeed;
             if (Speedandspin.y > 0 && speed <= maxSpeed)
             {
                 speed += accelerationSpeed;
-                //Speedometer.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, pointerPosition);
-                //SpeedometerPointer.transform.GetChild(0).rectTransform.position += new Vector3(0, 0.5f, 0);
-                //Speedometer.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition += new Vector2(0, 0.5f);
             }
             else if (Speedandspin.y < 0 && speed > 1f)
             {
                 speed -= accelerationSpeed;
-                //SpeedometerPointer.rectTransform.position += new Vector3(0, -0.5f, 0);
-                //Speedometer.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition += new Vector2(0, -0.5f);
-                //Speedometer.transform.GetChild(0).GetComponent<RectTransform>().anchoredPosition = new Vector2(0, pointerPosition);
             }
             rb.AddForce(transform.forward * speed);
-            //}
-            //else
-            //{
-            //    //if (currentBoost > 0)
-            //    //{
-            //    //    boostAnimate = BoostSpeed * Time.deltaTime;
-            //    //    plane.transform.Translate(Vector3.back * boostAnimate);
-            //    //    currentBoost -= boostAnimate;
-            //    //}
-            //    rb.AddForce(transform.forward * speed);
-            //}
 
             // Move player up and down
             if (movement.y != 0)
@@ -186,13 +155,6 @@ public class MovePlayer : MonoBehaviour
             {
                 rotationSpeedRL3 = graphicStartingSpeed;
                 rotationSpeedRL4 = graphicStartingSpeed;
-                //if (shiftHeld)
-                //{
-                //    rb.AddTorque(transform.forward * turnspeed * -movement.x);  // Spin the plane
-                //    spinMore = true;
-                //}
-                //else
-                //{
                 if (movement.x > 0)
                 {
                     if (currentRotationRL < maxRotationRL)
@@ -292,6 +254,7 @@ public class MovePlayer : MonoBehaviour
         rb.angularVelocity = Vector3.zero;
         transform.position = new Vector3(-117.11f, -0.08f, -193.58f);
         transform.rotation = Quaternion.Euler(0, 208.1f, 0);
+        //plane.transform.rotation = Quaternion.Euler(0, 0, 0);
+        setSpeed(2);
     }
-
 }
