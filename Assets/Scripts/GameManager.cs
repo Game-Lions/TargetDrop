@@ -1,16 +1,3 @@
-//using UnityEngine;
-//using System.Collections;
-//using TMPro;
-////using UnityEngine.UIElements;
-
-//using UnityEngine.UI;
-//using UnityEngine.InputSystem;
-//using UnityEngine.UIElements;
-//using UnityEngine.Audio;
-//using System;
-////using static UnityEngine.GraphicsBuffer;
-//using System.Collections.Generic;
-
 using UnityEngine;
 using System.Collections;
 using TMPro;
@@ -18,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using UnityEngine.Audio;
 using System.Collections.Generic;
-using Mono.Cecil.Cil;
+//using UnityEngine.UIElements;
 //using UnityEngine.UIElements;
 
 
@@ -68,8 +55,9 @@ public class GameManager : MonoBehaviour
     public AudioSource backgroundMusic;
 
     // Location objects
-    private GameObject[] CurrentTargets;
     public GameObject[] Levels;
+    private GameObject[] CurrentTargets;
+    private int[] scores;   // How many targets where hit in arcade
     private int Level = 0;
 
     // Manager Game state
@@ -83,8 +71,6 @@ public class GameManager : MonoBehaviour
     public RawImage miniMap;
     public RawImage miniMapPlayer;
 
-    // StopWatch
-    //public Stopwatch watch;
 
     // Timer
     public Timer timer;
@@ -108,6 +94,9 @@ public class GameManager : MonoBehaviour
     //public float scaleFactor;
     private int difficulty_level;
     public float[] difficulty;
+    bool arcadeFinished = false;
+    bool isRespawned = false;
+
 
     private void Awake()
     {
@@ -154,7 +143,8 @@ public class GameManager : MonoBehaviour
         textComponentForLevelScore = levelScore.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
         getTargets(Levels[0]);
         visibleTargets(false);
-
+        hitTargetScript.SetTarget("TelAviv"); // Set for tutorial 
+        scores = new int[Levels.Length];
         //freeFlyButton.onClick.
     }
     public void UpdateGameState(GameState newState)
@@ -185,6 +175,7 @@ public class GameManager : MonoBehaviour
             MissedOrHit.enabled = false;
             instructions.enabled = false;
             instructionsTextBackground.enabled = false;
+            background.enabled = true;
             InstructionsBackground.enabled = true;
             muteAndPlay.enabled = true;
             timer.StopTimer();
@@ -260,6 +251,7 @@ public class GameManager : MonoBehaviour
             SpeedometerP.enabled = true;
             Compass.enabled = true;
             next.enabled = false;
+            background.enabled = false;
             InstructionsBackground.enabled = false;
             controllers.enabled = false;
             controllersPic.SetActive(false);
@@ -320,18 +312,33 @@ public class GameManager : MonoBehaviour
             if (state == GameState.Arcade && Input.GetKeyDown(KeyCode.Return))
             {
                 // Called between each level
-                if (ArcadeStage == 0)
+                if (ArcadeStage == 0)   // && !arcadeFinished)
                 {
                     if (LevelScoreRules)
                     {
-                        ArcadeStage++;
+                        if (arcadeFinished)
+                        {
+                            Level = 0;
+                            state = GameState.FreeFly;
+                            arcadeFinished = false;
+                        }
+                        else
+                        {
+                            ArcadeStage++;
+                        }
                     }
                     else
                     {
-                        LevelScoreRules = true;
+                        LevelScoreRules = true; // This is basiclly just for changing the text and waiting for next enter pressed
                     }
 
                 }
+                //if (arcadeFinished)
+                //{
+                //    Level = 0;
+                //    state = GameState.FreeFly;
+                //    arcadeFinished = false;
+                //}
                 StopPlane(false);
                 levelScore.SetActive(false);
             }
@@ -384,14 +391,14 @@ public class GameManager : MonoBehaviour
         {
             case 0:
                 StopPlane(true);
-                hitTargetScript.SetTarget("TelAviv");
+                //hitTargetScript.SetTarget("TelAviv");
                 telAvivText.SetActive(true);
                 instructions.fontSize = 18;
                 //instructions.text = "Welcome to TargetDrop!";
                 isEnterPressedYet();
                 break;
             case 1:
-                background.enabled = false;
+                //background.enabled = false;
                 gameLogo.enabled = false;
                 Menu(true);
                 isEnterPressedYet();
@@ -434,15 +441,17 @@ public class GameManager : MonoBehaviour
                 targetText.enabled = false;
                 MissedOrHit.enabled = false;
                 targetLogo.enabled = false;
-                movePlayerScript.respawn();
+                if (!isRespawned)
+                {
+                    movePlayerScript.respawn();
+                    isRespawned = true;
+                }
                 StopPlane(true);
                 levelAmountOfTargets = CurrentTargets.Length;
-                //one_star = levelAmountOfTargets / 3f;
-                //two_stars = levelAmountOfTargets / 1.5f;
                 one_star = Mathf.Ceil(levelAmountOfTargets / 3f);
                 two_stars = Mathf.Ceil(levelAmountOfTargets / 1.5f);
                 three_stars = levelAmountOfTargets;
-                if (LevelScoreRules) // Only for first level
+                if (LevelScoreRules && Level < Levels.Length)
                 {
                     float count = Level + 1;
                     star_1_image.enabled = false;
@@ -459,11 +468,26 @@ public class GameManager : MonoBehaviour
                     //instructions.enabled = true;
                     //instructions.text = "Ready? press enter to begin the game!";
                 }
+                if (LevelScoreRules && arcadeFinished)
+                {
+                    textComponentForLevelScore.fontSize = 25;
+                    textComponentForLevelScore.text = "Congradulations!\n You Passed all levels\n" +
+                        "Youre score: " +
+                        "\nLevel 1 - " + scores[0] + "/" + Levels[0].transform.childCount +
+                        "\nLevel 2 - " + scores[1] + "/" + Levels[1].transform.childCount +
+                        "\nLevel 3 - " + scores[2] + "/" + Levels[2].transform.childCount +
+                        "\nLevel 4 - " + scores[3] + "/" + Levels[3].transform.childCount +
+                        "\nLevel 5 - " + scores[4] + "/" + Levels[4].transform.childCount +
+                        "\nLevel 6 - " + scores[5] + "/" + Levels[5].transform.childCount +
+                        "\nPress enter for Free Fly!";
+                    levelScore.SetActive(true);
+                }
                 enableEnterButton = true;
                 enablePauseButton = false;
                 isEnterPressedYet();
                 break;
             case 1:
+                isRespawned = false;
                 enableEnterButton = false;
                 enablePauseButton = true;
                 visibleTargets(true);
@@ -563,9 +587,6 @@ public class GameManager : MonoBehaviour
                 LevelScoreRules = false;
                 PassedLevel = false;
                 textComponentForLevelScore.text = "You need at least 1 star for next level,\n Try again!";
-                //star_1_image.enabled = true;f
-                //star_2_image.enabled = true;f
-                //star_3_image.enabled = true;false
                 star_1_image.color = Color.black;
                 star_2_image.color = Color.black;
                 star_3_image.color = Color.black;
@@ -575,36 +596,30 @@ public class GameManager : MonoBehaviour
                 LevelScoreRules = false;
                 PassedLevel = true;
                 textComponentForLevelScore.text = "Good Job! \n you passed level " + count;
-                //star_1_image.enabled = true;
-                //star_2_image.enabled = false;
-                //star_3_image.enabled = false;
                 star_1_image.color = Color.white;
                 star_2_image.color = Color.black;
                 star_3_image.color = Color.black;
+                scores[Level] = countHits;
             }
             else if (countHits >= two_stars && countHits < three_stars)
             {
                 LevelScoreRules = false;
                 PassedLevel = true;
                 textComponentForLevelScore.text = "Good Job! \n you passed level " + count;
-                //star_1_image.enabled = true;
-                //star_2_image.enabled = true;
-                //star_3_image.enabled = false;
                 star_1_image.color = Color.white;
                 star_2_image.color = Color.white;
                 star_3_image.color = Color.black;
+                scores[Level] = countHits;
             }
             else
             {
                 LevelScoreRules = false;
                 PassedLevel = true;
                 textComponentForLevelScore.text = "Good Job! \n you passed level " + count + " With all stars!";
-                //star_1_image.enabled = true;
-                //star_2_image.enabled = true;
-                //star_3_image.enabled = true;
                 star_1_image.color = Color.white;
                 star_2_image.color = Color.white;
                 star_3_image.color = Color.white;
+                scores[Level] = countHits;
             }
             levelScore.SetActive(true); // Score screen
             timer.StopTimer();
@@ -615,16 +630,18 @@ public class GameManager : MonoBehaviour
             targetLogo.enabled = false;
             MissedOrHit.enabled = false;
             StopPlane(true);
-            if (Level < Levels.Length && PassedLevel)
+            if (Level < Levels.Length - 1 && PassedLevel)
             {
                 Level++;
             }
-            else
+            else if (Level >= Levels.Length - 1 && PassedLevel)
             {
-                instructions.text = "Congradulations! you Passed all levels";
+                //instructions.text = "Congradulations!\n You Passed all levels \n Press enter for Free Fly!";
+                arcadeFinished = true;
+                //state = GameState.FreeFly;
+                //Level = 0;
             }
             Index_city = 0;
-            // Add if statment to go to next level or not
             getTargets(Levels[Level]);
             ArcadeStage = 0;
         }
@@ -723,7 +740,6 @@ public class GameManager : MonoBehaviour
     }
     public void FreeFlyButton()
     {
-
         state = GameState.FreeFly;
         movePlayerScript.respawn();
         PauseGame(false);
@@ -744,6 +760,8 @@ public class GameManager : MonoBehaviour
     }
     public void ArcadeButton()
     {
+        isRespawned = false;
+        scores = new int[Levels.Length];
         isDifficultyMenu = true;
         PauseGame(true);
         Debug.Log("Arcade pressed!");

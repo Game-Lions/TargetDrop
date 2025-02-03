@@ -31,7 +31,9 @@ public class Spawner : MonoBehaviour
             canDrop = false;  // Prevent dropping during cooldown
             GameObject parentObject = transform.parent.gameObject;
             GameObject obj = Instantiate(objectToSpawn, transform.position, Quaternion.identity);
-            // Apply a force or velocity to throw the object forward
+            //Vector3 positionToSpawn = new Vector3(transform.position.x, transform.position.y, transform.position.z-20); // Adjust as needed
+            //GameObject obj = Instantiate(objectToSpawn, positionToSpawn, Quaternion.identity);
+            // Apply a force or velocity to throw the object 
 
             Rigidbody rb = obj.GetComponent<Rigidbody>();
             if (rb != null)
@@ -46,7 +48,13 @@ public class Spawner : MonoBehaviour
                 //Vector3 combinedDirection = forwardDirection + upwardDirection;
                 //rb.AddForce(forwardDirection.normalized * throwForce, ForceMode.VelocityChange);
             }
-            obj.transform.rotation = parentObject.transform.rotation;
+
+            obj.transform.rotation = parentObject.transform.rotation; // Instead of this
+            obj.transform.rotation = Quaternion.Euler(0f, obj.transform.rotation.eulerAngles.y, 0f);
+
+            //rb.AddTorque(new Vector3(0,0.1f,0));
+            //obj.transform.rotation = Quaternion.Euler(0f, transform.rotation.y, 0f); // Added new!!!!!
+
             StartCoroutine(StartCooldown());
         }
     }

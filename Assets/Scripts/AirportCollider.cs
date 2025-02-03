@@ -6,7 +6,8 @@ public class AirportCollider : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Spawner"))
         {
-            Destroy(other.gameObject);
+            //Destroy(other.gameObject);
+            Destroy(other.transform.parent.gameObject);
         }
     }
 }

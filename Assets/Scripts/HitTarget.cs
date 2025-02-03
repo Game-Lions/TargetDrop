@@ -17,7 +17,8 @@ public class HitTarget : MonoBehaviour
             float distanceFromTarget = Vector3.Distance(other.transform.position, target.transform.position);
             Debug.Log("Distance from target: " + distanceFromTarget + " km");
             GameManager.instance.TargetHit(distanceFromTarget);     // Send information to gameManager
-            Destroy(other.gameObject);
+            //Destroy(other.gameObject);
+            Destroy(other.transform.parent.gameObject);
         }
         if (other.gameObject.CompareTag("Player"))
         {

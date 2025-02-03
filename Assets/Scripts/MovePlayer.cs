@@ -1,10 +1,11 @@
-using System;
+//using System;
 using System.Collections;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+
 
 public class MovePlayer : MonoBehaviour
 {
@@ -252,9 +253,36 @@ public class MovePlayer : MonoBehaviour
         // Reset velocity and angular velocity
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
-        transform.position = new Vector3(-117.11f, -0.08f, -193.58f);
-        transform.rotation = Quaternion.Euler(0, 208.1f, 0);
-        //plane.transform.rotation = Quaternion.Euler(0, 0, 0);
+
+
+
+        //transform.position = new Vector3(-117.11f, -0.08f, -193.58f);
+        //transform.rotation = Quaternion.Euler(0f, 208.1f, 0f);
+
+        //transform.position = new Vector3(-115.16f, 0.61f, -190.05f);
+        //transform.rotation = Quaternion.Euler(-9.3f, 29.14f, 0f);
+
+        //transform.position = new Vector3(-119.47f, 0.35f, -191.03f);
+        //transform.rotation = Quaternion.Euler(-5.1f, -57.28f, 0f);
+
+        //transform.position = new Vector3(-116.46f, 0.42f, -190.7f);
+        //transform.rotation = Quaternion.Euler(-6.6f, -282.8f, 0f);
+
+        // Define spawn points with their respective rotations
+        (Vector3 position, Quaternion rotation)[] spawnPoints = {
+        (new Vector3(-117.11f, -0.08f, -193.58f), Quaternion.Euler(0f, 208.1f, 0f)),
+        (new Vector3(-115.16f, 0.61f, -190.05f), Quaternion.Euler(-9.3f, 29.14f, 0f)),
+        (new Vector3(-119.47f, 0.35f, -191.03f), Quaternion.Euler(-5.1f, -57.28f, 0f)),
+        (new Vector3(-116.46f, 0.42f, -190.7f), Quaternion.Euler(-6.6f, -282.8f, 0f))
+        };
+
+        // Choose a random spawn point
+        int index = Random.Range(0, spawnPoints.Length);
+
+        // Apply the selected position and rotation
+        transform.position = spawnPoints[index].position;
+        transform.rotation = spawnPoints[index].rotation;
+
         setSpeed(2);
     }
 }
