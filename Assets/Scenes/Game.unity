@@ -60446,7 +60446,7 @@ MonoBehaviour:
       m_Flags: 4
     - m_Name: up
       m_Id: c4a55e94-9a17-45e4-be0d-ccba277a3b20
-      m_Path: <Keyboard>/w
+      m_Path: <Keyboard>/upArrow
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -60454,7 +60454,7 @@ MonoBehaviour:
       m_Flags: 8
     - m_Name: down
       m_Id: 5490b5bf-4c1e-4ea4-bf5b-22dbc352c9aa
-      m_Path: <Keyboard>/s
+      m_Path: <Keyboard>/downArrow
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -60495,7 +60495,7 @@ MonoBehaviour:
       m_Flags: 4
     - m_Name: up
       m_Id: 349d9951-0e08-4ab6-be7d-08de4cc770c6
-      m_Path: <Keyboard>/upArrow
+      m_Path: <Keyboard>/w
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -60503,7 +60503,7 @@ MonoBehaviour:
       m_Flags: 8
     - m_Name: down
       m_Id: de4bb258-1561-4c38-bd82-6533dcc121e3
-      m_Path: <Keyboard>/downArrow
+      m_Path: <Keyboard>/s
       m_Interactions: 
       m_Processors: 
       m_Groups: 
